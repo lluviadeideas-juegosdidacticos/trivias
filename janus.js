@@ -3,6 +3,7 @@
 
 	const BUILD = "build-4-j";
 	const SESSION_STORAGE_KEY = "janus_session_id";
+	const listeners = [];
 
 	function nowIso() {
 		return new Date().toISOString();
@@ -48,7 +49,19 @@
 		el.textContent = String(Janus.events.length);
 	}
 
+	function notify(event) {
+		for (const fn of listeners) {
+			try {
+				fn(event);
+			} catch (err) {
+				console.warn("[Janus] listener error", err);
+			}
+		}
+	}
+
 	const Janus = {
+		build: BUILD,
+		debug: true,
 		events: [],
 
 		log(type, source, payload) {
@@ -64,8 +77,27 @@
 
 			Janus.events.push(event);
 			updateDiagnostics();
-			console.log("[Janus]", event);
+			if (Janus.debug) console.log("[Janus]", event);
+			notify(event);
 			return event;
+		},
+
+		onEvent(fn) {
+			if (typeof fn !== "function") return () => {};
+			listeners.push(fn);
+			return () => {
+				const idx = listeners.indexOf(fn);
+				if (idx >= 0) listeners.splice(idx, 1);
+			};
+		},
+		getLastEvent() {
+			return Janus.events.length ? Janus.events[Janus.events.length - 1] : null;
+		},
+		getSessionId() {
+			return sessionId;
+		},
+		getBuild() {
+			return BUILD;
 		},
 
 		getEvents() {

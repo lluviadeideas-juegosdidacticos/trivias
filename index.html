@@ -8,73 +8,130 @@
   </head>
   <body>
     <main class="container">
-      <h1 class="title">Lluvia de Ideas — Trivias</h1>
-      <p class="subtitle">Jugá, aprendé y explorá nuevas preguntas</p>
-
-      <button class="primary-button" id="start-button" type="button">Comenzar</button>
-
-      <section id="trivia-selector" class="selector" hidden>
-        <h2 class="selector-title">Elegí una trivia</h2>
-
-        <div class="field">
-          <label class="label" for="trivia-set">Trivia disponible</label>
-          <select id="trivia-set" class="select" disabled>
-            <option selected>Guía de cuestiones Impacto Ambiental v1.2</option>
-          </select>
+      <header class="app-header" aria-label="Header">
+        <div class="app-header-card card">
+          <h1 class="brand">Lluvia de Ideas</h1>
+          <p class="tagline">Motor de preguntas — Impacto Ambiental</p>
         </div>
+      </header>
 
-        <div class="field">
-          <label class="label" for="manual-code">Ingresá un código (3 cifras)</label>
-          <input
-            id="manual-code"
-            class="input"
-            type="text"
-            inputmode="numeric"
-            maxlength="3"
-            placeholder="Ej: 146"
-            autocomplete="off"
-          />
-        </div>
+      <div class="layout" aria-label="Layout">
+        <section class="product-column" aria-label="Producto">
+          <button class="primary-button" id="start-button" type="button">Comenzar</button>
 
-        <button class="secondary-button" id="roll-button" type="button">Simular tirada</button>
+          <section id="trivia-selector" class="selector card" hidden>
+            <h2 class="selector-title">Motor de preguntas</h2>
 
-        <div class="checks" role="group" aria-label="Opciones de visualización">
-          <label class="check">
-            <input id="show-intro" type="checkbox" />
-            <span>Mostrar introducción</span>
-          </label>
-          <label class="check">
-            <input id="show-outro" type="checkbox" />
-            <span>Mostrar texto final</span>
-          </label>
-        </div>
-      </section>
+            <div class="field">
+              <label class="label" for="trivia-set">Base activa</label>
+              <select id="trivia-set" class="select" disabled>
+                <option selected>Guía de cuestiones Impacto Ambiental v1.2</option>
+              </select>
+            </div>
 
-      <section class="result" aria-label="Resultado">
-        <div class="result-row">
-          <span class="result-label">Código</span>
-          <span id="result-code" class="result-value">—</span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">Estado</span>
-          <span id="app-status" class="status" aria-live="polite"></span>
-        </div>
+            <div class="field">
+              <label class="label" for="manual-code">Ingresá un código (3 cifras)</label>
+              <input
+                id="manual-code"
+                class="input"
+                type="text"
+                inputmode="numeric"
+                maxlength="3"
+                placeholder="Ej: 146"
+                autocomplete="off"
+              />
+            </div>
 
-        <div class="result-block" aria-label="Contenido">
-          <p id="result-intro" class="result-text" hidden></p>
-          <p id="result-question" class="result-question" hidden></p>
+            <button class="secondary-button" id="roll-button" type="button">Simular tirada</button>
 
-          <div id="result-answers" class="answers" hidden aria-label="Opciones de respuesta"></div>
-          <p id="result-feedback" class="feedback" hidden aria-live="polite"></p>
+            <div class="field-group" aria-label="Explorar por tema y subtema">
+              <h3 class="group-title">Explorar por tema</h3>
 
-          <p id="result-outro" class="result-text" hidden></p>
-        </div>
-      </section>
+              <div class="field">
+                <label class="label" for="topic-select">Tema</label>
+                <select id="topic-select" class="select" disabled>
+                  <option selected value="">Cargando temas…</option>
+                </select>
+              </div>
 
-      <aside class="diagnostic" aria-label="Diagnóstico">
-        <span class="diagnostic-label">Eventos</span>
-        <span id="janus-count" class="diagnostic-value">0</span>
-      </aside>
+              <div class="field">
+                <label class="label" for="subtopic-select">Subtema</label>
+                <select id="subtopic-select" class="select" disabled>
+                  <option selected value="">Seleccioná un tema primero</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="toggles" role="group" aria-label="Opciones de visualización">
+              <button id="toggle-intro" class="toggle" type="button" aria-pressed="true" data-state="on">
+                Introducción
+              </button>
+              <button id="toggle-outro" class="toggle" type="button" aria-pressed="true" data-state="on">
+                Texto final
+              </button>
+            </div>
+          </section>
+
+          <section class="result card" aria-label="Pregunta">
+            <div class="result-row">
+              <span class="result-label">Código</span>
+              <span id="result-code" class="result-value">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Estado</span>
+              <span id="app-status" class="status" aria-live="polite"></span>
+            </div>
+
+            <div class="result-block" aria-label="Contenido">
+              <div class="question-card" aria-label="Pregunta">
+                <p id="result-intro" class="result-text" hidden></p>
+                <p id="result-question" class="result-question" hidden></p>
+                <p id="result-outro" class="result-text" hidden></p>
+              </div>
+
+              <div class="answers-card" aria-label="Respuestas">
+                <div id="result-answers" class="answers" hidden aria-label="Opciones de respuesta"></div>
+                <p id="result-feedback" class="feedback" hidden aria-live="polite"></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="audit card" aria-label="Auditoría de base">
+            <h2 class="audit-title">Auditoría de base</h2>
+            <button id="audit-export" class="secondary-button audit-export" type="button" disabled>
+              Exportar auditoría
+            </button>
+            <div id="audit-content" class="audit-content">Cargando auditoría…</div>
+          </section>
+        </section>
+
+        <aside class="governance-column" aria-label="Gobernanza">
+          <section class="janus-console card" aria-label="Janus Governance Console">
+            <div class="janus-console-header">
+              <h2 class="janus-console-title">Janus Governance Console</h2>
+            </div>
+
+            <div class="janus-console-grid">
+              <div class="janus-kv"><span class="janus-k">Build</span><span id="janus-build" class="janus-v">—</span></div>
+              <div class="janus-kv"><span class="janus-k">Session</span><span id="janus-session" class="janus-v">—</span></div>
+              <div class="janus-kv"><span class="janus-k">Eventos</span><span id="janus-count" class="janus-v">0</span></div>
+              <div class="janus-kv"><span class="janus-k">Último evento</span><span id="janus-last" class="janus-v">—</span></div>
+              <div class="janus-kv"><span class="janus-k">CSV activo</span><span id="janus-csv" class="janus-v">—</span></div>
+              <div class="janus-kv"><span class="janus-k">Auditoría</span><span id="janus-audit" class="janus-v">—</span></div>
+            </div>
+
+            <div class="protocol-layer" aria-label="Protocol Layer">
+              <div class="protocol-title">Protocol Layer</div>
+              <div class="badges">
+                <span class="badge" data-layer="product">Product</span>
+                <span class="badge" data-layer="events">Events</span>
+                <span class="badge" data-layer="audit">Audit</span>
+                <span class="badge" data-layer="export">Export</span>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </div>
     </main>
 
     <script src="./janus.js" defer></script>
