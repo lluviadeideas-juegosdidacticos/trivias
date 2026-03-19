@@ -63,11 +63,21 @@
         <div class="result-block" aria-label="Contenido">
           <p id="result-intro" class="result-text" hidden></p>
           <p id="result-question" class="result-question" hidden></p>
+
+          <div id="result-answers" class="answers" hidden aria-label="Opciones de respuesta"></div>
+          <p id="result-feedback" class="feedback" hidden aria-live="polite"></p>
+
           <p id="result-outro" class="result-text" hidden></p>
         </div>
       </section>
+
+      <aside class="diagnostic" aria-label="Diagnóstico">
+        <span class="diagnostic-label">Eventos</span>
+        <span id="janus-count" class="diagnostic-value">0</span>
+      </aside>
     </main>
 
+    <script src="./janus.js" defer></script>
     <script src="./app.js" defer></script>
   </body>
 </html>

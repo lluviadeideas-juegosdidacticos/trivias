@@ -4,6 +4,11 @@ function setStatus(text) {
 	statusEl.textContent = text;
 }
 
+function janusLog(type, source, payload) {
+	if (!window.Janus || typeof window.Janus.log !== "function") return;
+	window.Janus.log(type, source, payload);
+}
+
 function setResultCode(code) {
 	const codeEl = document.getElementById("result-code");
 	if (!codeEl) return;
@@ -22,6 +27,59 @@ function setResultText(id, text) {
 
 	el.textContent = text;
 	el.hidden = false;
+}
+
+function setFeedback(text, kind) {
+	const el = document.getElementById("result-feedback");
+	if (!el) return;
+
+	el.classList.remove("feedback--ok", "feedback--bad");
+
+	if (!text) {
+		el.textContent = "";
+		el.hidden = true;
+		return;
+	}
+
+	if (kind === "ok") el.classList.add("feedback--ok");
+	if (kind === "bad") el.classList.add("feedback--bad");
+
+	el.textContent = text;
+	el.hidden = false;
+}
+
+function setAnswers(options) {
+	const container = document.getElementById("result-answers");
+	if (!container) return;
+
+	container.innerHTML = "";
+
+	if (!options || options.length === 0) {
+		container.hidden = true;
+		return;
+	}
+
+	for (const option of options) {
+		const button = document.createElement("button");
+		button.type = "button";
+		button.className = "answer-option";
+		button.dataset.choice = option.choice;
+		button.disabled = Boolean(option.disabled);
+
+		const meta = document.createElement("span");
+		meta.className = "answer-meta";
+		meta.textContent = option.choice;
+
+		const text = document.createElement("span");
+		text.className = "answer-text";
+		text.textContent = option.text;
+
+		button.appendChild(meta);
+		button.appendChild(text);
+		container.appendChild(button);
+	}
+
+	container.hidden = false;
 }
 
 function showTriviaSelector() {
@@ -133,6 +191,7 @@ let currentCode = null;
 let currentRecord = null;
 
 async function loadTriviaDb() {
+	janusLog("app_loaded", "system", { csvPath: CSV_PATH });
 	const response = await fetch(CSV_PATH);
 	if (!response.ok) {
 		throw new Error(`CSV fetch failed (${response.status})`);
@@ -163,6 +222,10 @@ async function loadTriviaDb() {
 		headers,
 		idHeader,
 		questionHeader: headerMap.get("PREGUNTA") ?? null,
+		answerAHeader: headerMap.get("RESPUESTAS A") ?? headerMap.get("RESPUESTA A") ?? null,
+		answerBHeader: headerMap.get("RESPUESTA B") ?? null,
+		answerCHeader: headerMap.get("RESPUESTA C") ?? null,
+		correctHeader: headerMap.get("RESPUESTA CORRECTA") ?? null,
 		introHeader: headerMap.get("TEXTO INTRODUCTORIO") ?? null,
 		outroHeader: headerMap.get("TEXTO FINAL") ?? null,
 		byIdJuego,
@@ -176,6 +239,7 @@ function renderRecordForCode(code, record) {
 	currentCode = code;
 	currentRecord = record;
 	setResultCode(code);
+	setFeedback("", "");
 
 	const showIntro = Boolean(document.getElementById("show-intro")?.checked);
 	const showOutro = Boolean(document.getElementById("show-outro")?.checked);
@@ -186,6 +250,33 @@ function renderRecordForCode(code, record) {
 		const question = String(record[triviaDb.questionHeader] ?? "").trim();
 		setResultText("result-question", question || "Pregunta no disponible para este código.");
 	}
+
+	const options = [
+		{
+			choice: "A",
+			text: triviaDb?.answerAHeader
+				? String(record[triviaDb.answerAHeader] ?? "").trim()
+				: "",
+		},
+		{
+			choice: "B",
+			text: triviaDb?.answerBHeader
+				? String(record[triviaDb.answerBHeader] ?? "").trim()
+				: "",
+		},
+		{
+			choice: "C",
+			text: triviaDb?.answerCHeader
+				? String(record[triviaDb.answerCHeader] ?? "").trim()
+				: "",
+		},
+	].map((o) => ({
+		...o,
+		disabled: !o.text,
+		text: o.text || `Opción ${o.choice} no disponible.`,
+	}));
+
+	setAnswers(options);
 
 	if (showIntro) {
 		if (!triviaDb?.introHeader) {
@@ -217,7 +308,10 @@ function renderNotFound(code) {
 	setResultText("result-intro", "");
 	setResultText("result-outro", "");
 	setResultText("result-question", `No se encontró pregunta para el código ${code}`);
+	setAnswers([]);
+	setFeedback("", "");
 	setStatus(`No se encontró pregunta para el código ${code}`);
+	janusLog("question_not_found", "lookup", { code });
 }
 
 function lookupAndRender(code) {
@@ -232,6 +326,12 @@ function lookupAndRender(code) {
 		return;
 	}
 
+	if (currentCode !== code) {
+		setFeedback("", "");
+	}
+
+	janusLog("question_found", "lookup", { code });
+
 	renderRecordForCode(code, record);
 }
 
@@ -241,6 +341,8 @@ window.addEventListener("DOMContentLoaded", () => {
 	setResultText("result-intro", "");
 	setResultText("result-question", "");
 	setResultText("result-outro", "");
+	setAnswers([]);
+	setFeedback("", "");
 
 	loadTriviaDb()
 		.then(() => {
@@ -260,6 +362,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	startButton.addEventListener("click", () => {
 		showTriviaSelector();
+		janusLog("trivia_started", "ui", { action: "start" });
 	});
 
 	const manualCodeInput = document.getElementById("manual-code");
@@ -272,12 +375,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
 			if (isValidCode(normalized)) {
 				setStatus(`Código listo para buscar: ${normalized}`);
+				janusLog("code_entered", "ui", { code: normalized });
 				lookupAndRender(normalized);
 			} else if (normalized.length === 0) {
 				setResultCode("—");
 				setResultText("result-intro", "");
 				setResultText("result-question", "");
 				setResultText("result-outro", "");
+				setAnswers([]);
+				setFeedback("", "");
 				currentCode = null;
 				currentRecord = null;
 			}
@@ -290,6 +396,7 @@ window.addEventListener("DOMContentLoaded", () => {
 			showTriviaSelector();
 			const code = generateRollCode();
 			setStatus(`Código generado: ${code}`);
+			janusLog("dice_generated", "ui", { code });
 			lookupAndRender(code);
 		});
 	}
@@ -301,4 +408,37 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	document.getElementById("show-intro")?.addEventListener("change", rerender);
 	document.getElementById("show-outro")?.addEventListener("change", rerender);
+
+	document.getElementById("result-answers")?.addEventListener("click", (event) => {
+		const button = event.target.closest("button[data-choice]");
+		if (!button) return;
+		if (!currentRecord || !triviaDb) return;
+
+		const choice = String(button.dataset.choice ?? "").toUpperCase();
+		janusLog("answer_selected", "ui", { code: currentCode, choice });
+
+		if (!triviaDb.correctHeader) {
+			setFeedback("No se puede validar: campo RESPUESTA CORRECTA no disponible en esta base.", "bad");
+			setStatus("No se pudo validar la respuesta.");
+			return;
+		}
+
+		const correct = String(currentRecord[triviaDb.correctHeader] ?? "").trim().toUpperCase();
+		if (!/^[ABC]$/.test(correct)) {
+			setFeedback("No se pudo validar: valor de respuesta correcta inválido.", "bad");
+			setStatus("No se pudo validar la respuesta.");
+			return;
+		}
+
+		if (choice === correct) {
+			janusLog("answer_correct", "validation", { code: currentCode, choice, correct });
+			setFeedback("Respuesta correcta", "ok");
+			setStatus("Respuesta correcta");
+			return;
+		}
+
+		janusLog("answer_incorrect", "validation", { code: currentCode, choice, correct });
+		setFeedback(`Respuesta incorrecta. La correcta era: ${correct}`, "bad");
+		setStatus(`Respuesta incorrecta. La correcta era: ${correct}`);
+	});
 });
