@@ -13,7 +13,59 @@
 
       <button class="primary-button" id="start-button" type="button">Comenzar</button>
 
-      <div id="app-status" class="status" aria-live="polite"></div>
+      <section id="trivia-selector" class="selector" hidden>
+        <h2 class="selector-title">Elegí una trivia</h2>
+
+        <div class="field">
+          <label class="label" for="trivia-set">Trivia disponible</label>
+          <select id="trivia-set" class="select" disabled>
+            <option selected>Guía de cuestiones Impacto Ambiental v1.2</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="label" for="manual-code">Ingresá un código (3 cifras)</label>
+          <input
+            id="manual-code"
+            class="input"
+            type="text"
+            inputmode="numeric"
+            maxlength="3"
+            placeholder="Ej: 146"
+            autocomplete="off"
+          />
+        </div>
+
+        <button class="secondary-button" id="roll-button" type="button">Simular tirada</button>
+
+        <div class="checks" role="group" aria-label="Opciones de visualización">
+          <label class="check">
+            <input id="show-intro" type="checkbox" />
+            <span>Mostrar introducción</span>
+          </label>
+          <label class="check">
+            <input id="show-outro" type="checkbox" />
+            <span>Mostrar texto final</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="result" aria-label="Resultado">
+        <div class="result-row">
+          <span class="result-label">Código</span>
+          <span id="result-code" class="result-value">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Estado</span>
+          <span id="app-status" class="status" aria-live="polite"></span>
+        </div>
+
+        <div class="result-block" aria-label="Contenido">
+          <p id="result-intro" class="result-text" hidden></p>
+          <p id="result-question" class="result-question" hidden></p>
+          <p id="result-outro" class="result-text" hidden></p>
+        </div>
+      </section>
     </main>
 
     <script src="./app.js" defer></script>
