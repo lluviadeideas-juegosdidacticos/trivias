@@ -109,22 +109,17 @@ body {
 	background: radial-gradient(circle at center, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0));
 }
 
-.hero-kicker {
-	margin: 0;
-	font-weight: 900;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	font-size: 0.78rem;
-	color: rgba(17, 24, 39, 0.72);
-	position: relative;
+.hero-title {
+	text-align: center;
+	font-size: 2rem;
+	margin-bottom: 8px;
 }
 
-.hero-title {
-	margin: 10px 0 0;
-	font-size: clamp(1.6rem, 2.8vw + 1rem, 2.5rem);
-	line-height: 1.1;
-	letter-spacing: -0.02em;
-	position: relative;
+.brand-logo {
+	width: 110px;
+	margin: 0 auto 12px auto;
+	display: block;
+	opacity: 0.9;
 }
 
 .hero-subtitle {
