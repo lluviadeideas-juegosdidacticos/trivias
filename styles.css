@@ -183,28 +183,14 @@ body {
 
 @media (min-width: 980px) {
 	.layout {
-		grid-template-columns: 1.6fr 1fr;
+		grid-template-columns: 1fr;
 		align-items: start;
 	}
 }
 
-.product-column,
-.governance-column {
+.product-column {
 	display: grid;
 	gap: 18px;
-}
-
-@media (min-width: 980px) {
-	.governance-column {
-		justify-items: end;
-	}
-
-	.janus-console {
-		width: 100%;
-		max-width: 420px;
-		position: sticky;
-		top: 24px;
-	}
 }
 
 /* BUTTONS */
