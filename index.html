@@ -53,28 +53,9 @@
             </div>
 
             <button class="secondary-button" id="roll-button" type="button">Simular tirada</button>
-
-            <div class="field-group" aria-label="Explorar por tema y subtema">
-              <h3 class="group-title">Explorar por tema</h3>
-
-              <div class="field">
-                <label class="label" for="topic-select">Tema</label>
-                <select id="topic-select" class="select" disabled>
-                  <option selected value="">Cargando temas…</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label class="label" for="subtopic-select">Subtema</label>
-                <select id="subtopic-select" class="select" disabled>
-                  <option selected value="">Seleccioná un tema primero</option>
-                </select>
-              </div>
-            </div>
-
           </section>
 
-          <section class="result card" aria-label="Pregunta">
+          <section class="meta card" aria-label="Estado">
             <div class="result-row">
               <span class="result-label">Código</span>
               <span id="result-code" class="result-value">—</span>
@@ -83,27 +64,34 @@
               <span class="result-label">Estado</span>
               <span id="app-status" class="status" aria-live="polite"></span>
             </div>
-
-            <div class="result-block" aria-label="Contenido">
-              <div class="question-card" aria-label="Pregunta">
-                <p id="result-intro" class="result-text" hidden></p>
-                <p id="result-question" class="result-question" hidden></p>
-                <p id="result-outro" class="result-text" hidden></p>
-              </div>
-
-              <div class="answers-card" aria-label="Respuestas">
-                <div id="result-answers" class="answers" hidden aria-label="Opciones de respuesta"></div>
-                <p id="result-feedback" class="feedback" hidden aria-live="polite"></p>
-              </div>
-            </div>
           </section>
 
-          <section class="audit card" aria-label="Auditoría de base">
-            <h2 class="audit-title">Auditoría de base</h2>
-            <button id="audit-export" class="secondary-button audit-export" type="button" disabled>
-              Exportar auditoría
-            </button>
-            <div id="audit-content" class="audit-content">Cargando auditoría…</div>
+          <section id="intro-card" class="content-card card" aria-label="Texto introductorio" hidden>
+            <h3 class="content-title">Texto introductorio</h3>
+            <p class="content-subtitle">tiene pistas a otras preguntas</p>
+            <p id="result-intro" class="content-text"></p>
+          </section>
+
+          <section class="content-card card" aria-label="Pregunta">
+            <h3 class="content-title">Pregunta</h3>
+            <p id="result-question" class="result-question" hidden></p>
+          </section>
+
+          <section class="content-card card" aria-label="Respuestas">
+            <h3 class="content-title">Respuestas</h3>
+            <div id="result-answers" class="answers" hidden aria-label="Opciones de respuesta"></div>
+          </section>
+
+          <section class="content-card card" aria-label="Resultado">
+            <h3 class="content-title">Resultado</h3>
+            <p id="result-hint" class="result-hint">Elegí una respuesta para ver si es correcta.</p>
+            <p id="result-feedback" class="feedback" hidden aria-live="polite"></p>
+          </section>
+
+          <section id="outro-card" class="content-card card" aria-label="Texto ampliatorio" hidden>
+            <h3 class="content-title">Texto ampliatorio</h3>
+            <p class="content-subtitle">lectura opcional para profundizar</p>
+            <p id="result-outro" class="content-text"></p>
           </section>
         </section>
 

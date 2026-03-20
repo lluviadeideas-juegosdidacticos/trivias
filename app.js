@@ -85,12 +85,17 @@ function setResultText(id, text) {
 function setFeedback(text, kind) {
 	const el = document.getElementById("result-feedback");
 	if (!el) return;
+	const hintEl = document.getElementById("result-hint");
 
 	el.classList.remove("feedback--ok", "feedback--bad");
 
 	if (!text) {
 		el.textContent = "";
 		el.hidden = true;
+		if (hintEl) {
+			hintEl.textContent = "Elegí una respuesta para ver la devolución";
+			hintEl.hidden = false;
+		}
 		return;
 	}
 
@@ -99,6 +104,13 @@ function setFeedback(text, kind) {
 
 	el.textContent = text;
 	el.hidden = false;
+	if (hintEl) hintEl.hidden = true;
+}
+
+function setCardHidden(id, hidden) {
+	const el = document.getElementById(id);
+	if (!el) return;
+	el.hidden = Boolean(hidden);
 }
 
 function setAnswers(options) {
@@ -584,6 +596,7 @@ function renderRecordForCode(code, record) {
 	currentRecord = record;
 	setResultCode(code);
 	setFeedback("", "");
+	setCardHidden("outro-card", true);
 	setResultText("result-outro", "");
 
 	if (!triviaDb?.questionHeader) {
@@ -622,8 +635,15 @@ function renderRecordForCode(code, record) {
 
 	if (triviaDb?.introHeader) {
 		const intro = String(record[triviaDb.introHeader] ?? "").trim();
-		setResultText("result-intro", intro);
+		if (intro) {
+			setCardHidden("intro-card", false);
+			setResultText("result-intro", intro);
+		} else {
+			setCardHidden("intro-card", true);
+			setResultText("result-intro", "");
+		}
 	} else {
+		setCardHidden("intro-card", true);
 		setResultText("result-intro", "");
 	}
 
@@ -633,10 +653,17 @@ function renderRecordForCode(code, record) {
 
 function revealOutroForCurrentRecord() {
 	if (!triviaDb?.outroHeader || !currentRecord) {
+		setCardHidden("outro-card", true);
 		setResultText("result-outro", "");
 		return;
 	}
 	const outro = String(currentRecord[triviaDb.outroHeader] ?? "").trim();
+	if (!outro) {
+		setCardHidden("outro-card", true);
+		setResultText("result-outro", "");
+		return;
+	}
+	setCardHidden("outro-card", false);
 	setResultText("result-outro", outro);
 }
 
@@ -644,6 +671,8 @@ function renderNotFound(code) {
 	currentCode = code;
 	currentRecord = null;
 	setResultCode(code);
+	setCardHidden("intro-card", true);
+	setCardHidden("outro-card", true);
 	setResultText("result-intro", "");
 	setResultText("result-outro", "");
 	setResultText("result-question", `No se encontró pregunta para el código ${code}`);
@@ -701,6 +730,8 @@ function serveRandomQuestion() {
 window.addEventListener("DOMContentLoaded", () => {
 	setStatus("Listo para explorar.");
 	setResultCode("—");
+	setCardHidden("intro-card", true);
+	setCardHidden("outro-card", true);
 	setResultText("result-intro", "");
 	setResultText("result-question", "");
 	setResultText("result-outro", "");
@@ -768,6 +799,8 @@ window.addEventListener("DOMContentLoaded", () => {
 				lookupAndRender(normalized);
 			} else if (normalized.length === 0) {
 				setResultCode("—");
+				setCardHidden("intro-card", true);
+				setCardHidden("outro-card", true);
 				setResultText("result-intro", "");
 				setResultText("result-question", "");
 				setResultText("result-outro", "");
