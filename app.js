@@ -141,12 +141,6 @@ function setAuditHtml(html) {
 	el.innerHTML = html;
 }
 
-function showTriviaSelector() {
-	const selectorEl = document.getElementById("trivia-selector");
-	if (!selectorEl) return;
-	selectorEl.hidden = false;
-}
-
 function parseCsv(text) {
 	const rows = [];
 	let row = [];
@@ -255,11 +249,10 @@ function normalizeCorrectChoice(value) {
 const CSV_PATH = "./data/impacto-ambiental-v1-2.csv";
 let triviaDb = null;
 let pendingCode = null;
+let pendingRandomQuestion = false;
 let currentCode = null;
 let currentRecord = null;
 let latestAuditReport = null;
-let showIntro = true;
-let showOutro = true;
 
 async function loadTriviaDb() {
 	janusLog("app_loaded", "system", { csvPath: CSV_PATH });
@@ -591,6 +584,7 @@ function renderRecordForCode(code, record) {
 	currentRecord = record;
 	setResultCode(code);
 	setFeedback("", "");
+	setResultText("result-outro", "");
 
 	if (!triviaDb?.questionHeader) {
 		setResultText("result-question", "Campo de pregunta no disponible en esta base.");
@@ -626,33 +620,24 @@ function renderRecordForCode(code, record) {
 
 	setAnswers(options);
 
-	if (showIntro) {
-		if (!triviaDb?.introHeader) {
-			setResultText("result-intro", "Campo introductorio no disponible en esta base.");
-		} else {
-			const intro = String(record[triviaDb.introHeader] ?? "").trim();
-			setResultText("result-intro", intro || "Introducción no disponible para este código.");
-		}
+	if (triviaDb?.introHeader) {
+		const intro = String(record[triviaDb.introHeader] ?? "").trim();
+		setResultText("result-intro", intro);
 	} else {
 		setResultText("result-intro", "");
 	}
 
-	if (showOutro) {
-		if (!triviaDb?.outroHeader) {
-			setResultText("result-outro", "Campo final no disponible en esta base.");
-		} else {
-			const outro = String(record[triviaDb.outroHeader] ?? "").trim();
-			setResultText("result-outro", outro || "Texto final no disponible para este código.");
-		}
-	} else {
-		setResultText("result-outro", "");
-	}
+	// TEXTO FINAL: se muestra automáticamente al responder.
+	setResultText("result-outro", "");
 }
 
-function setToggleUi(el, isOn) {
-	if (!el) return;
-	el.setAttribute("aria-pressed", isOn ? "true" : "false");
-	el.setAttribute("data-state", isOn ? "on" : "off");
+function revealOutroForCurrentRecord() {
+	if (!triviaDb?.outroHeader || !currentRecord) {
+		setResultText("result-outro", "");
+		return;
+	}
+	const outro = String(currentRecord[triviaDb.outroHeader] ?? "").trim();
+	setResultText("result-outro", outro);
 }
 
 function renderNotFound(code) {
@@ -689,8 +674,32 @@ function lookupAndRender(code) {
 	renderRecordForCode(code, record);
 }
 
+function serveRandomQuestion() {
+	if (!triviaDb?.byIdJuego) {
+		pendingRandomQuestion = true;
+		setStatus("Cargando base…");
+		return;
+	}
+
+	const entries = Array.from(triviaDb.byIdJuego.entries()).filter(([code]) => isValidCode(code));
+	if (entries.length === 0) {
+		setStatus("No hay preguntas disponibles para servir.");
+		janusLog("random_question_unavailable", "engine", { reason: "empty_pool" });
+		return;
+	}
+
+	const [code] = entries[Math.floor(Math.random() * entries.length)];
+	setStatus(`Pregunta aleatoria servida: ${code}`);
+	janusLog("random_question_served", "engine", { code, origin: "cta" });
+
+	const manualCodeInput = document.getElementById("manual-code");
+	if (manualCodeInput) manualCodeInput.value = code;
+
+	lookupAndRender(code);
+}
+
 window.addEventListener("DOMContentLoaded", () => {
-	setStatus("Build 0 listo");
+	setStatus("Listo para explorar.");
 	setResultCode("—");
 	setResultText("result-intro", "");
 	setResultText("result-question", "");
@@ -699,6 +708,12 @@ window.addEventListener("DOMContentLoaded", () => {
 	setFeedback("", "");
 	updateJanusConsole();
 	window.Janus?.onEvent?.(() => updateJanusConsole());
+
+	const tryQuestionButton = document.getElementById("try-question");
+	tryQuestionButton?.addEventListener("click", () => {
+		janusLog("cta_try_question", "ui", { action: "random_question" });
+		serveRandomQuestion();
+	});
 
 	loadTriviaDb()
 		.then(() => {
@@ -716,6 +731,11 @@ window.addEventListener("DOMContentLoaded", () => {
 				pendingCode = null;
 				lookupAndRender(code);
 			}
+
+			if (pendingRandomQuestion) {
+				pendingRandomQuestion = false;
+				serveRandomQuestion();
+			}
 		})
 		.catch((error) => {
 			console.error(error);
@@ -732,14 +752,6 @@ window.addEventListener("DOMContentLoaded", () => {
 			metrics: latestAuditReport.metrics,
 		});
 		updateJanusConsole();
-	});
-
-	const startButton = document.getElementById("start-button");
-	if (!startButton) return;
-
-	startButton.addEventListener("click", () => {
-		showTriviaSelector();
-		janusLog("trivia_started", "ui", { action: "start" });
 	});
 
 	const manualCodeInput = document.getElementById("manual-code");
@@ -770,7 +782,6 @@ window.addEventListener("DOMContentLoaded", () => {
 	const rollButton = document.getElementById("roll-button");
 	if (rollButton) {
 		rollButton.addEventListener("click", () => {
-			showTriviaSelector();
 			const code = generateRollCode();
 			setStatus(`Código generado: ${code}`);
 			janusLog("dice_generated", "ui", { code });
@@ -822,25 +833,6 @@ window.addEventListener("DOMContentLoaded", () => {
 		renderRecordForCode(currentCode, currentRecord);
 	};
 
-	const toggleIntroButton = document.getElementById("toggle-intro");
-	const toggleOutroButton = document.getElementById("toggle-outro");
-	setToggleUi(toggleIntroButton, showIntro);
-	setToggleUi(toggleOutroButton, showOutro);
-
-	toggleIntroButton?.addEventListener("click", () => {
-		showIntro = !showIntro;
-		setToggleUi(toggleIntroButton, showIntro);
-		janusLog("toggle_intro", "ui", { enabled: showIntro });
-		rerender();
-	});
-
-	toggleOutroButton?.addEventListener("click", () => {
-		showOutro = !showOutro;
-		setToggleUi(toggleOutroButton, showOutro);
-		janusLog("toggle_final", "ui", { enabled: showOutro });
-		rerender();
-	});
-
 	document.getElementById("result-answers")?.addEventListener("click", (event) => {
 		const button = event.target.closest("button[data-choice]");
 		if (!button) return;
@@ -852,6 +844,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		if (!triviaDb.correctHeader) {
 			setFeedback("No se puede validar: campo RESPUESTA CORRECTA no disponible en esta base.", "bad");
 			setStatus("No se pudo validar la respuesta.");
+			revealOutroForCurrentRecord();
 			return;
 		}
 
@@ -860,6 +853,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		if (!correctChoice) {
 			setFeedback("No se pudo validar: valor de respuesta correcta inválido.", "bad");
 			setStatus("No se pudo validar la respuesta.");
+			revealOutroForCurrentRecord();
 			return;
 		}
 
@@ -867,11 +861,13 @@ window.addEventListener("DOMContentLoaded", () => {
 			janusLog("answer_correct", "validation", { code: currentCode, choice, correct: correctChoice });
 			setFeedback("Respuesta correcta", "ok");
 			setStatus("Respuesta correcta");
+			revealOutroForCurrentRecord();
 			return;
 		}
 
 		janusLog("answer_incorrect", "validation", { code: currentCode, choice, correct: correctChoice });
 		setFeedback(`Respuesta incorrecta. La correcta era: ${correctChoice}`, "bad");
 		setStatus(`Respuesta incorrecta. La correcta era: ${correctChoice}`);
+		revealOutroForCurrentRecord();
 	});
 });

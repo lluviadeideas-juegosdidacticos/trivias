@@ -3,23 +3,33 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lluvia de Ideas — Trivias</title>
+    <title>Explorá Impacto Ambiental | Lluvia de Ideas</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="container">
-      <header class="app-header" aria-label="Header">
-        <div class="app-header-card card">
-          <h1 class="brand">Lluvia de Ideas</h1>
-          <p class="tagline">Motor de preguntas — Impacto Ambiental</p>
+      <header class="hero" aria-label="Hero">
+        <div class="hero-card card">
+          <p class="hero-kicker">Lluvia de Ideas</p>
+          <h1 class="hero-title">Explorá Impacto Ambiental</h1>
+          <p class="hero-subtitle">Accedé gratis a una selección de preguntas del juego</p>
+          <p class="hero-note">Probá una pregunta ahora o descubrí el juego completo.</p>
+
+          <div class="hero-actions" aria-label="Acciones">
+            <button class="primary-button" id="try-question" type="button">Probar una pregunta</button>
+            <a
+              class="secondary-button"
+              href="https://www.lluviadeideas-juegosdidacticos.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Ver el juego completo</a>
+          </div>
         </div>
       </header>
 
       <div class="layout" aria-label="Layout">
         <section class="product-column" aria-label="Producto">
-          <button class="primary-button" id="start-button" type="button">Comenzar</button>
-
-          <section id="trivia-selector" class="selector card" hidden>
+          <section id="trivia-selector" class="selector card">
             <h2 class="selector-title">Motor de preguntas</h2>
 
             <div class="field">
@@ -62,14 +72,6 @@
               </div>
             </div>
 
-            <div class="toggles" role="group" aria-label="Opciones de visualización">
-              <button id="toggle-intro" class="toggle" type="button" aria-pressed="true" data-state="on">
-                Introducción
-              </button>
-              <button id="toggle-outro" class="toggle" type="button" aria-pressed="true" data-state="on">
-                Texto final
-              </button>
-            </div>
           </section>
 
           <section class="result card" aria-label="Pregunta">
@@ -132,6 +134,10 @@
           </section>
         </aside>
       </div>
+
+      <footer class="site-footer" aria-label="Atribución">
+        <small class="site-footer-text">Powered by <span class="site-footer-link">Janus Governance</span></small>
+      </footer>
     </main>
 
     <script src="./janus.js" defer></script>
