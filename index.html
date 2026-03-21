@@ -12,9 +12,7 @@
     <div id="app"></div>
     <script type="module">
       import { TriviaApp } from './src/trivia/TriviaApp.js';
-      import { createElement } from 'https://esm.sh/react@18.2.0';
-      import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
-      createRoot(document.getElementById('app')).render(createElement(TriviaApp));
+      TriviaApp(document.getElementById('app'));
     </script>
   </body>
 </html>

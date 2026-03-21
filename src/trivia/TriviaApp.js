@@ -1,6 +1,5 @@
 
 
-import { useState } from "https://esm.sh/react@18.2.0";
 import { HomeScreen } from "./HomeScreen.js";
 import { GameScreen } from "./GameScreen.js";
 import "./styles.css";
@@ -8,16 +7,33 @@ import "./styles.css";
 console.log("TRIVIA VERSION NEW");
 
 // Controlador principal de estado
-export function TriviaApp() {
-  const [screen, setScreen] = useState("home");
-  const [questionNumber, setQuestionNumber] = useState(null);
+export function TriviaApp(root) {
+  let screen = "home";
+  let questionNumber = null;
 
   function handleStart(number) {
-    setQuestionNumber(number);
-    setScreen("game");
+    questionNumber = number;
+    screen = "game";
   }
 
-  return screen === "home"
-    ? HomeScreen({ onStart: handleStart })
-    : GameScreen({ questionNumber, onBack: () => setScreen("home") });
+  function render() {
+    root.innerHTML = "";
+    if (screen === "home") {
+      HomeScreen({
+        mount: root,
+        onStart: handleStart,
+      });
+    } else {
+      GameScreen({
+        mount: root,
+        questionNumber,
+        onBack: () => {
+          screen = "home";
+          questionNumber = null;
+          render();
+        },
+      });
+    }
+  }
 }
+  render();

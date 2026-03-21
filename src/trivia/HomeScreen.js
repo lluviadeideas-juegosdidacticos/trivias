@@ -13,26 +13,22 @@ export function HomeScreen({ onStart }) {
       setDigits((prev) => {
         const next = [...prev];
         next[currentIndex] = roll;
-        return next;
-      });
-      setCurrentIndex((idx) => idx + 1);
-      setRolling(false);
-    }, 350);
-  }
+        export function HomeScreen({ mount, onStart }) {
+          let digits = [null, null, null];
+          let currentIndex = 0;
+          let rolling = false;
 
   function handleStart() {
-    const number = Number(digits.join(""));
-    if (!isNaN(number) && digits.every((d) => d !== null)) {
-      onStart(number);
-    }
-  }
-
-  return (
-    <div className="trivia-app" role="main" style={{ position: 'relative', minHeight: 480 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2rem' }}>
-        {/* Logo principal Impacto Ambiental */}
-        <img src="/assets/logo_impactoambiental.gif" alt="Impacto Ambiental" style={{ width: 160, maxWidth: '80vw', margin: '0 auto 8px', display: 'block' }} />
-        <h1 className="trivia-title" style={{ marginBottom: 0, marginTop: 0, fontSize: '2.1rem' }}>Impacto Ambiental</h1>
+            if (currentIndex > 2 || rolling) return;
+            rolling = true;
+            updateDigitsUI();
+            setTimeout(() => {
+              const roll = Math.floor(Math.random() * 6) + 1;
+              digits[currentIndex] = roll;
+              currentIndex++;
+              rolling = false;
+              updateDigitsUI();
+            }, 350);
         <div className="trivia-subtitle" style={{ fontWeight: 600 }}>Guía de Cuestiones 2.0</div>
         <div style={{ fontSize: '1.08rem', color: '#444', marginBottom: 8, textAlign: 'center' }}>
           Tirá el dado 3 veces o tocá el dado para generar tu número de pregunta

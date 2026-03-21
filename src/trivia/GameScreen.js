@@ -13,17 +13,13 @@ export function GameScreen({ questionNumber, onBack }) {
   const [showExplanation, setShowExplanation] = useState(false);
 
   // Si se pasa questionNumber, buscar pregunta por id exacto
-  let q = null;
-  let showNumber = null;
-  let progress = null;
-  if (questionNumber) {
-    q = questions.find((p) => p.id === questionNumber);
-    showNumber = `Pregunta Nº ${questionNumber}`;
-    progress = null;
-    if (!q) {
-      console.error("Question ID not found:", questionNumber);
-    }
+  import { questions } from "./data.js";
   } else {
+  export function GameScreen({ mount, questionNumber, onBack }) {
+    let current = 0;
+    let selected = null;
+    let showFeedback = false;
+    let showExplanation = false;
     q = questions[current];
     progress = `Pregunta ${current + 1} de ${questions.length}`;
   }
