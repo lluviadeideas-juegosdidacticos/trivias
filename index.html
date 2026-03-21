@@ -1,4 +1,5 @@
 <!doctype html>
+<!doctype html>
 <!-- trivia build: 2026-03-21 -->
 <html lang="es">
   <head>
@@ -8,93 +9,12 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="container">
-      <header class="hero" aria-label="Hero">
-        <div class="hero-card card">
-      <img src="assets/isologo_negro.svg" alt="Lluvia de Ideas" class="brand-logo" />
-      <h1 class="hero-title">Guía de Cuestiones 2.0</h1>
-          <p class="hero-subtitle">Accedé gratis a una selección de preguntas del juego</p>
-          <p class="hero-note">Probá una pregunta y recibí devolución al instante.</p>
-
-          <div class="hero-actions" aria-label="Acciones">
-            <button class="primary-button" id="try-question" type="button">Probar una pregunta</button>
-          </div>
-        </div>
-      </header>
-
-      <div class="layout" aria-label="Layout">
-        <section class="product-column" aria-label="Producto">
-          <section id="trivia-selector" class="selector card">
-            <h2 class="selector-title">Motor de preguntas</h2>
-
-            <div class="field">
-              <label class="label" for="trivia-set">Base activa</label>
-              <select id="trivia-set" class="select" disabled>
-                <option selected>Guía de cuestiones Impacto Ambiental v1.2</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="label" for="manual-code">Ingresá un código (3 cifras)</label>
-              <input
-                id="manual-code"
-                class="input"
-                type="text"
-                inputmode="numeric"
-                maxlength="3"
-                placeholder="Ej: 146"
-                autocomplete="off"
-              />
-            </div>
-
-            <button class="secondary-button" id="roll-button" type="button">Simular tirada</button>
-          </section>
-
-          <section id="intro-card" class="content-card card" aria-label="Texto introductorio" hidden>
-            <h3 class="content-title">Texto introductorio</h3>
-            <p class="content-subtitle">tiene pistas a otras preguntas</p>
-            <p id="result-intro" class="content-text"></p>
-          </section>
-
-          <section class="content-card card" aria-label="Pregunta">
-            <h3 class="content-title">Pregunta</h3>
-            <p id="result-question" class="result-question" hidden></p>
-          </section>
-
-          <section class="content-card card" aria-label="Respuestas">
-            <h3 class="content-title">Respuestas</h3>
-            <div id="result-answers" class="answers" hidden aria-label="Opciones de respuesta"></div>
-          </section>
-
-          <section class="content-card card" aria-label="Resultado">
-            <h3 class="content-title">Resultado</h3>
-            <p id="result-hint" class="result-hint">Elegí una respuesta para ver si es correcta.</p>
-            <p id="result-feedback" class="feedback" hidden aria-live="polite"></p>
-          </section>
-
-          <section id="outro-card" class="content-card card" aria-label="Texto ampliatorio" hidden>
-            <h3 class="content-title">Texto ampliatorio</h3>
-            <p class="content-subtitle">lectura opcional para profundizar</p>
-            <p id="result-outro" class="content-text"></p>
-          </section>
-        </section>
-      </div>
-
-      <footer class="site-footer" aria-label="Atribución">
-  		<small class="site-footer-text"><span class="site-footer-link">Powered by Janus Governance</span></small>
-      </footer>
-    </main>
-
-    <script src="./janus.js" defer></script>
+    <div id="app"></div>
     <script type="module">
       import { TriviaApp } from './src/trivia/TriviaApp.js';
       import { createElement } from 'https://esm.sh/react@18.2.0';
       import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
-      const triviaRoot = document.createElement('div');
-      triviaRoot.id = 'trivia-root';
-      document.body.appendChild(triviaRoot);
-      createRoot(triviaRoot).render(createElement(TriviaApp));
+      createRoot(document.getElementById('app')).render(createElement(TriviaApp));
     </script>
-    <script src="./app.js" defer></script>
   </body>
 </html>
