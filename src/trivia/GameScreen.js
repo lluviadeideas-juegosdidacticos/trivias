@@ -21,9 +21,7 @@ export function GameScreen({ questionNumber }) {
     showNumber = `Pregunta Nº ${questionNumber}`;
     progress = null;
     if (!q) {
-      console.warn('No se encontró pregunta con id', questionNumber);
-      // fallback: mostrar la primera pregunta para no romper UI
-      q = questions[0];
+      console.error("Question ID not found:", questionNumber);
     }
   } else {
     q = questions[current];
@@ -57,7 +55,11 @@ export function GameScreen({ questionNumber }) {
         <div className="trivia-question-number" style={{ fontSize: '1.1rem', color: '#1a73e8', fontWeight: 600, marginBottom: 8, textAlign: 'right' }}>{showNumber}</div>
       )}
       {progress && <div className="trivia-progress" aria-label="Progreso">{progress}</div>}
-      <div className="trivia-question" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{q.question}</div>
+      {q ? (
+        <div className="trivia-question" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{q.question}</div>
+      ) : (
+        <div className="trivia-question" style={{ fontSize: '1.2rem', color: '#c62828', fontWeight: 600, margin: '2rem 0' }}>Pregunta no disponible</div>
+      )}
       <div className="trivia-options">
         {q.options.map((opt, idx) => {
           let btnClass = "trivia-option";
