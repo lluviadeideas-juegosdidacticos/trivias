@@ -1,14 +1,13 @@
 
-import { useState } from "react";
-import { questions } from "./data";
+import { questions } from "./data.js";
 
 // Pantalla 2: GameScreen
 
-
-
-export function GameScreen({ questionNumber, onBack }) {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState(null);
+export function GameScreen({ mount, questionNumber, onBack }) {
+  let current = 0;
+  let selected = null;
+  let showFeedback = false;
+  let showExplanation = false;
   const [showFeedback, setShowFeedback] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
