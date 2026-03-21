@@ -4,11 +4,15 @@ import { questions } from "./data";
 
 // Pantalla 2: GameScreen
 
-export function GameScreen() {
+
+export function GameScreen({ questionNumber }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+
+  // Si se pasa questionNumber, mostrarlo arriba
+  const showNumber = questionNumber ? `Pregunta Nº ${questionNumber}` : null;
 
   const q = questions[current];
   const isAnswered = selected !== null;
@@ -34,6 +38,9 @@ export function GameScreen() {
 
   return (
     <div className="trivia-app" role="main">
+      {showNumber && (
+        <div className="trivia-question-number" style={{ fontSize: '1.1rem', color: '#1a73e8', fontWeight: 600, marginBottom: 8, textAlign: 'right' }}>{showNumber}</div>
+      )}
       <div className="trivia-progress" aria-label="Progreso">{progress}</div>
       <div className="trivia-question" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{q.question}</div>
       <div className="trivia-options">
