@@ -21,3 +21,6 @@ node_modules/
 # Build outputs (por si se agregan más adelante)
 dist/
 build/
+
+# Janus sync temp external repo
+_external/
