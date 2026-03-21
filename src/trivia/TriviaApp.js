@@ -1,8 +1,11 @@
 
+
 import { useState } from "react";
 import { HomeScreen } from "./HomeScreen";
 import { GameScreen } from "./GameScreen";
 import "./styles.css";
+
+console.log("TRIVIA VERSION NEW");
 
 // Controlador principal de estado
 export function TriviaApp() {
