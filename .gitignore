@@ -22,5 +22,3 @@ node_modules/
 dist/
 build/
 
-# Janus sync temp external repo
-_external/
