@@ -1,0 +1,87 @@
+/* Trivia UI: claridad y jerarquía visual */
+.trivia-app {
+  font-family: system-ui, sans-serif;
+  max-width: 420px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 2rem 1.5rem;
+}
+.trivia-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.trivia-subtitle {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+.trivia-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.trivia-btn:active {
+  background: #155ab6;
+}
+.trivia-question {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1.2rem;
+}
+.trivia-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.2rem;
+}
+.trivia-option {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s, border 0.2s;
+}
+.trivia-option.selected {
+  border: 2px solid #1a73e8;
+  background: #e3f0fd;
+}
+.trivia-option.correct {
+  border: 2px solid #2e7d32;
+  background: #e6f4ea;
+}
+.trivia-option.incorrect {
+  border: 2px solid #c62828;
+  background: #fdeaea;
+}
+.trivia-feedback {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  min-height: 1.5em;
+}
+.trivia-feedback.correct {
+  color: #2e7d32;
+}
+.trivia-feedback.incorrect {
+  color: #c62828;
+}
+.trivia-explanation {
+  font-size: 0.98rem;
+  color: #444;
+  background: #f8f9fa;
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.2rem;
+}

@@ -85,6 +85,15 @@
     </main>
 
     <script src="./janus.js" defer></script>
+    <script type="module">
+      import { TriviaApp } from './src/trivia/TriviaApp.js';
+      import { createElement } from 'https://esm.sh/react@18.2.0';
+      import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+      const triviaRoot = document.createElement('div');
+      triviaRoot.id = 'trivia-root';
+      document.body.appendChild(triviaRoot);
+      createRoot(triviaRoot).render(createElement(TriviaApp));
+    </script>
     <script src="./app.js" defer></script>
   </body>
 </html>
