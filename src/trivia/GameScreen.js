@@ -1,7 +1,5 @@
 import { questions } from "./data.js";
 
-// Pantalla 2: GameScreen
-
 export function GameScreen({ mount, questionNumber, onBack }) {
   let current = 0;
   let selected = null;
