@@ -1,5 +1,6 @@
 
 
+// TriviaApp browser-native, sin React ni JSX
 import { HomeScreen } from "./HomeScreen.js";
 import { GameScreen } from "./GameScreen.js";
 import "./styles.css";
@@ -35,5 +36,6 @@ export function TriviaApp(root) {
       });
     }
   }
+  render();
 }
   render();

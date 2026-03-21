@@ -1,106 +1,134 @@
-import { useState } from "https://esm.sh/react@18.2.0";
+// HomeScreen browser-native, sin React ni JSX
+export function HomeScreen({ mount, onStart }) {
+  let digits = [null, null, null];
+  let currentIndex = 0;
+  let rolling = false;
 
-export function HomeScreen({ onStart }) {
-  const [digits, setDigits] = useState([null, null, null]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [rolling, setRolling] = useState(false);
+  const root = document.createElement('div');
+  root.style.position = 'relative';
+  root.style.minHeight = '480px';
 
-  function handleRoll() {
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
+  container.style.gap = '1.2rem';
+
+  // Logo
+  const logo = document.createElement('img');
+  logo.src = './assets/logo_impactoambiental.gif';
+  logo.alt = 'Impacto Ambiental';
+  logo.style.width = '160px';
+  logo.style.maxWidth = '80vw';
+  logo.style.margin = '0 auto 8px';
+  logo.style.display = 'block';
+  container.appendChild(logo);
+
+  // Título
+  const title = document.createElement('h1');
+  title.textContent = 'Impacto Ambiental';
+  title.style.marginBottom = '0';
+  title.style.marginTop = '0';
+  title.style.fontSize = '2.1rem';
+  container.appendChild(title);
+
+  // Subtítulo
+  const subtitle = document.createElement('div');
+  subtitle.textContent = 'Guía de Cuestiones 2.0';
+  subtitle.style.fontWeight = '600';
+  container.appendChild(subtitle);
+
+  // Instrucción
+  const instr = document.createElement('div');
+  instr.textContent = 'Tirá el dado 3 veces o tocá el dado para generar tu número de pregunta';
+  instr.style.fontSize = '1.08rem';
+  instr.style.color = '#444';
+  instr.style.marginBottom = '8px';
+  instr.style.textAlign = 'center';
+  container.appendChild(instr);
+
+  // Digits
+  const digitsRow = document.createElement('div');
+  digitsRow.style.display = 'flex';
+  digitsRow.style.gap = '1.2rem';
+  digitsRow.style.margin = '1.2rem 0';
+  const digitBoxes = [0, 1, 2].map((i) => {
+    const box = document.createElement('div');
+    box.style.width = '54px';
+    box.style.height = '64px';
+    box.style.border = '2px solid #1a73e8';
+    box.style.borderRadius = '10px';
+    box.style.display = 'flex';
+    box.style.alignItems = 'center';
+    box.style.justifyContent = 'center';
+    box.style.fontSize = '2.2rem';
+    box.style.fontWeight = '700';
+    box.style.background = '#f5f5f5';
+    box.style.color = '#bbb';
+    box.textContent = '—';
+    digitsRow.appendChild(box);
+    return box;
+  });
+  container.appendChild(digitsRow);
+
+  // Tirar dado
+  const rollBtn = document.createElement('button');
+  rollBtn.textContent = 'Tirar dado';
+  rollBtn.style.fontSize = '1.2rem';
+  rollBtn.style.padding = '0.7em 1.6em';
+  rollBtn.style.borderRadius = '8px';
+  rollBtn.style.background = '#1a73e8';
+  rollBtn.style.color = '#fff';
+  rollBtn.style.border = 'none';
+  rollBtn.style.fontWeight = '600';
+  rollBtn.style.cursor = 'pointer';
+  rollBtn.style.marginBottom = '12px';
+  container.appendChild(rollBtn);
+
+  // Jugar pregunta
+  const playBtn = document.createElement('button');
+  playBtn.textContent = 'Jugar pregunta';
+  playBtn.style.fontSize = '1.1rem';
+  playBtn.style.padding = '0.6em 1.4em';
+  playBtn.style.borderRadius = '8px';
+  playBtn.style.background = '#43a047';
+  playBtn.style.color = '#fff';
+  playBtn.style.border = 'none';
+  playBtn.style.fontWeight = '600';
+  playBtn.style.cursor = 'pointer';
+  container.appendChild(playBtn);
+
+  function updateDigitsUI() {
+    digitBoxes.forEach((box, i) => {
+      const d = digits[i];
+      box.textContent = d !== null ? d : '—';
+      box.style.background = d !== null ? '#e3f0fd' : '#f5f5f5';
+      box.style.color = d !== null ? '#1a73e8' : '#bbb';
+    });
+    playBtn.disabled = digits.some((d) => d === null);
+    rollBtn.disabled = currentIndex > 2 || rolling;
+    rollBtn.textContent = currentIndex > 2 ? 'Listo' : rolling ? 'Tirando…' : 'Tirar dado';
+  }
+
+  rollBtn.addEventListener('click', () => {
     if (currentIndex > 2 || rolling) return;
-    setRolling(true);
+    rolling = true;
+    updateDigitsUI();
     setTimeout(() => {
       const roll = Math.floor(Math.random() * 6) + 1;
-      setDigits((prev) => {
-        const next = [...prev];
-        next[currentIndex] = roll;
-        export function HomeScreen({ mount, onStart }) {
-          let digits = [null, null, null];
-          let currentIndex = 0;
-          let rolling = false;
+      digits[currentIndex] = roll;
+      currentIndex++;
+      rolling = false;
+      updateDigitsUI();
+    }, 350);
+  });
 
-  function handleStart() {
-            if (currentIndex > 2 || rolling) return;
-            rolling = true;
-            updateDigitsUI();
-            setTimeout(() => {
-              const roll = Math.floor(Math.random() * 6) + 1;
-              digits[currentIndex] = roll;
-              currentIndex++;
-              rolling = false;
-              updateDigitsUI();
-            }, 350);
-        <div className="trivia-subtitle" style={{ fontWeight: 600 }}>Guía de Cuestiones 2.0</div>
-        <div style={{ fontSize: '1.08rem', color: '#444', marginBottom: 8, textAlign: 'center' }}>
-          Tirá el dado 3 veces o tocá el dado para generar tu número de pregunta
-        </div>
+  playBtn.addEventListener('click', () => {
+    const number = Number(digits.join(''));
+    if (!isNaN(number) && digits.every((d) => d !== null)) {
+      onStart(number);
+    }
+  });
 
-        <div style={{ display: 'flex', gap: '1.2rem', margin: '1.2rem 0' }}>
-          {digits.map((d, i) => (
-            <div
-              key={i}
-              className="trivia-digit-box"
-              style={{
-                width: 54,
-                height: 64,
-                border: '2px solid #1a73e8',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2.2rem',
-                fontWeight: 700,
-                background: d !== null ? '#e3f0fd' : '#f5f5f5',
-                color: d !== null ? '#1a73e8' : '#bbb',
-                transition: 'background 0.2s, color 0.2s',
-              }}
-              aria-label={d !== null ? `Dígito ${i + 1}: ${d}` : `Dígito ${i + 1} vacío`}
-            >
-              {d !== null ? d : '_'}
-            </div>
-          ))}
-        </div>
-
-        <button
-          className={"trivia-dice-btn" + (rolling ? " rolling" : "")}
-          style={{
-            fontSize: '2.5rem',
-            width: 80,
-            height: 80,
-            borderRadius: '50%',
-            border: '2px solid #1a73e8',
-            background: '#fff',
-            boxShadow: '0 2px 8px #0001',
-            marginBottom: 8,
-            cursor: currentIndex > 2 ? 'not-allowed' : 'pointer',
-            transition: 'transform 0.3s',
-            outline: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            userSelect: 'none',
-          }}
-          onClick={handleRoll}
-          disabled={currentIndex > 2 || rolling}
-          aria-label="Tirar dado"
-        >
-          <span role="img" aria-label="Dado" style={{ display: 'inline-block', transition: 'transform 0.3s', transform: rolling ? 'rotate(360deg)' : 'none' }}>
-            🎲
-          </span>
-        </button>
-
-        <button
-          className="trivia-btn"
-          style={{ marginTop: 16, width: 180 }}
-          onClick={handleStart}
-          disabled={digits.some((d) => d === null)}
-        >
-          Ver pregunta
-        </button>
-      </div>
-      {/* Logo secundario Lluvia de Ideas al pie */}
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 18, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
-        <img src="/assets/isologo_negro.svg" alt="Lluvia de Ideas" style={{ width: 54, opacity: 0.65, filter: 'grayscale(1)', pointerEvents: 'none' }} />
-      </div>
-    </div>
-  );
-}
+  updateDigitsUI();
+  root.appendChild(container);
