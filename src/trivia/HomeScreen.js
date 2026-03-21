@@ -29,10 +29,11 @@ export function HomeScreen({ onStart }) {
   }
 
   return (
-    <div className="trivia-app" role="main">
+    <div className="trivia-app" role="main" style={{ position: 'relative', minHeight: 480 }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.2rem' }}>
-        <img src="/assets/isologo_negro.svg" alt="Impacto Ambiental" style={{ width: 64, height: 64, marginBottom: 8 }} />
-        <h1 className="trivia-title" style={{ marginBottom: 0 }}>Impacto Ambiental</h1>
+        {/* Logo principal Impacto Ambiental */}
+        <img src="/assets/logo_impactoambiental.gif" alt="Impacto Ambiental" style={{ width: 160, maxWidth: '80vw', margin: '0 auto 8px', display: 'block' }} />
+        <h1 className="trivia-title" style={{ marginBottom: 0, marginTop: 0, fontSize: '2.1rem' }}>Impacto Ambiental</h1>
         <div className="trivia-subtitle" style={{ fontWeight: 600 }}>Guía de Cuestiones 2.0</div>
         <div style={{ fontSize: '1.08rem', color: '#444', marginBottom: 8, textAlign: 'center' }}>
           Tirá el dado 3 veces o tocá el dado para generar tu número de pregunta
@@ -100,6 +101,10 @@ export function HomeScreen({ onStart }) {
         >
           Ver pregunta
         </button>
+      </div>
+      {/* Logo secundario Lluvia de Ideas al pie */}
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 18, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+        <img src="/assets/isologo_negro.svg" alt="Lluvia de Ideas" style={{ width: 54, opacity: 0.65, filter: 'grayscale(1)', pointerEvents: 'none' }} />
       </div>
     </div>
   );
