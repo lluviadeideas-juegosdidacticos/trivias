@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState } from "https://esm.sh/react@18.2.0";
 
 export function HomeScreen({ onStart }) {
   const [digits, setDigits] = useState([null, null, null]);
