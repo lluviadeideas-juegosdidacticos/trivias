@@ -1,6 +1,7 @@
 // Preguntas mock para la trivia
 export const questions = [
   {
+    id: 111,
     question: "¿Cuál es el principal gas responsable del efecto invernadero?",
     options: [
       "Oxígeno",
@@ -12,6 +13,7 @@ export const questions = [
     explanation: "El dióxido de carbono (CO₂) es el principal gas responsable del efecto invernadero antropogénico."
   },
   {
+    id: 222,
     question: "¿Qué recurso es esencial para la vida y debe ser protegido?",
     options: [
       "Petróleo",
@@ -23,6 +25,7 @@ export const questions = [
     explanation: "El agua dulce es esencial para la vida y su protección es fundamental para los ecosistemas y la humanidad."
   },
   {
+    id: 333,
     question: "¿Cuál de los siguientes es un residuo reciclable?",
     options: [
       "Papel",
@@ -34,6 +37,7 @@ export const questions = [
     explanation: "El papel es un residuo reciclable común. Los otros requieren tratamientos especiales."
   },
   {
+    id: 444,
     question: "¿Qué acción ayuda a reducir la huella de carbono?",
     options: [
       "Usar transporte público",
@@ -45,6 +49,7 @@ export const questions = [
     explanation: "Utilizar transporte público reduce las emisiones de gases de efecto invernadero por persona."
   },
   {
+    id: 555,
     question: "¿Qué significa biodiversidad?",
     options: [
       "Variedad de especies vivas",

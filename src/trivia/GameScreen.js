@@ -5,21 +5,30 @@ import { questions } from "./data";
 // Pantalla 2: GameScreen
 
 
+
 export function GameScreen({ questionNumber }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
-  // Si se pasa questionNumber, mostrarlo arriba
-  const showNumber = questionNumber ? `Pregunta Nº ${questionNumber}` : null;
-
-  const q = questions[current];
-  const isAnswered = selected !== null;
-  const isCorrect = isAnswered && selected === q.answer;
-
-  // Progreso
-  const progress = `Pregunta ${current + 1} de ${questions.length}`;
+  // Si se pasa questionNumber, buscar pregunta por id exacto
+  let q = null;
+  let showNumber = null;
+  let progress = null;
+  if (questionNumber) {
+    q = questions.find((p) => p.id === questionNumber);
+    showNumber = `Pregunta Nº ${questionNumber}`;
+    progress = null;
+    if (!q) {
+      console.warn('No se encontró pregunta con id', questionNumber);
+      // fallback: mostrar la primera pregunta para no romper UI
+      q = questions[0];
+    }
+  } else {
+    q = questions[current];
+    progress = `Pregunta ${current + 1} de ${questions.length}`;
+  }
 
   function handleSelect(idx) {
     if (!isAnswered) {
@@ -29,11 +38,17 @@ export function GameScreen({ questionNumber }) {
     }
   }
 
+
   function handleNext() {
     setSelected(null);
     setShowFeedback(false);
     setShowExplanation(false);
-    setCurrent((prev) => (prev + 1 < questions.length ? prev + 1 : 0));
+    if (questionNumber) {
+      // Si se entró por dado, volver a home al terminar
+      window.location.reload(); // simple reset UX
+    } else {
+      setCurrent((prev) => (prev + 1 < questions.length ? prev + 1 : 0));
+    }
   }
 
   return (
@@ -41,7 +56,7 @@ export function GameScreen({ questionNumber }) {
       {showNumber && (
         <div className="trivia-question-number" style={{ fontSize: '1.1rem', color: '#1a73e8', fontWeight: 600, marginBottom: 8, textAlign: 'right' }}>{showNumber}</div>
       )}
-      <div className="trivia-progress" aria-label="Progreso">{progress}</div>
+      {progress && <div className="trivia-progress" aria-label="Progreso">{progress}</div>}
       <div className="trivia-question" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{q.question}</div>
       <div className="trivia-options">
         {q.options.map((opt, idx) => {
