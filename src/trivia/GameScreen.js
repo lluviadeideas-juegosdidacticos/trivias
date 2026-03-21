@@ -6,7 +6,7 @@ import { questions } from "./data";
 
 
 
-export function GameScreen({ questionNumber }) {
+export function GameScreen({ questionNumber, onBack }) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -58,7 +58,10 @@ export function GameScreen({ questionNumber }) {
       {q ? (
         <div className="trivia-question" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{q.question}</div>
       ) : (
-        <div className="trivia-question" style={{ fontSize: '1.2rem', color: '#c62828', fontWeight: 600, margin: '2rem 0' }}>Pregunta no disponible</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', margin: '2rem 0' }}>
+          <div className="trivia-question" style={{ fontSize: '1.2rem', color: '#c62828', fontWeight: 600 }}>Pregunta no disponible</div>
+          <button className="trivia-btn" style={{ width: 180 }} onClick={onBack}>Volver a tirar</button>
+        </div>
       )}
       <div className="trivia-options">
         {q.options.map((opt, idx) => {
