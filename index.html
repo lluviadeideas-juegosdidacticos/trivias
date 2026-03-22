@@ -11,9 +11,22 @@
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      window.onerror = function (msg, url, line, col, error) {
+        document.body.innerHTML = "<pre style='color:red'>" +
+          msg + "\n" +
+          url + ":" + line + ":" + col +
+          "\n" + (error && error.stack) +
+        "</pre>";
+      };
+    </script>
     <script type="module">
       import { TriviaApp } from './src/trivia/TriviaApp.js';
-      TriviaApp(document.getElementById('app'));
+      try {
+        TriviaApp(document.getElementById('app'));
+      } catch (e) {
+        document.body.innerHTML = "<pre style='color:red'>" + e.stack + "</pre>";
+      }
     </script>
   </body>
 </html>
