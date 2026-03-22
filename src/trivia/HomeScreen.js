@@ -6,25 +6,30 @@ export function HomeScreen({ mount, onStart }) {
   root.style.justifyContent = 'center';
   root.style.minHeight = '480px';
 
-  // Logo
-  const logo = document.createElement('div');
-  logo.textContent = '🌱 Impacto Ambiental';
-  logo.style.fontSize = '2.2rem';
-  logo.style.fontWeight = 'bold';
-  logo.style.marginBottom = '0.5rem';
-  root.appendChild(logo);
+
+  // Logo Impacto Ambiental (encabezado)
+  const logoImg = document.createElement('img');
+  logoImg.src = '/assets/logo_impactoambiental.gif';
+  logoImg.alt = 'Impacto Ambiental';
+  logoImg.style.width = '220px';
+  logoImg.style.marginBottom = '0.7rem';
+  root.appendChild(logoImg);
 
   // Subtítulo
   const subtitle = document.createElement('h2');
-  subtitle.textContent = 'Genera tu pregunta aleatoria';
+  subtitle.textContent = 'Guía de Cuestiones 2.0';
   subtitle.style.marginBottom = '0.5rem';
   root.appendChild(subtitle);
 
-  // Texto
-  const text = document.createElement('div');
-  text.textContent = 'Tira el dado tres veces para obtener un número de pregunta.';
-  text.style.marginBottom = '1.2rem';
-  root.appendChild(text);
+  // Texto introductorio exacto
+  const intro = document.createElement('div');
+  intro.textContent = 'Bienvenidos a la plataforma de trivias de Impacto Ambiental, nuestro libro juego.\nPuedes tirar el dado tres veces para generar un número de pregunta.\nLuego podrás acceder a la consigna correspondiente.';
+  intro.style.fontSize = '1.08rem';
+  intro.style.color = '#444';
+  intro.style.marginBottom = '1.2rem';
+  intro.style.textAlign = 'center';
+  intro.style.whiteSpace = 'pre-line';
+  root.appendChild(intro);
 
   // Dado y celdas
   let rolls = [];
@@ -96,6 +101,20 @@ export function HomeScreen({ mount, onStart }) {
       onStart(generatedNumber);
     }
   });
+
+  // Pie de página: logo Lluvia de Ideas con opacidad reducida
+  const footer = document.createElement('div');
+  footer.style.width = '100%';
+  footer.style.display = 'flex';
+  footer.style.justifyContent = 'center';
+  footer.style.marginTop = '2.5rem';
+  const lluviaLogo = document.createElement('img');
+  lluviaLogo.src = '/assets/isologo_negro.svg';
+  lluviaLogo.alt = 'Lluvia de Ideas';
+  lluviaLogo.style.height = '38px';
+  lluviaLogo.style.opacity = '0.28';
+  footer.appendChild(lluviaLogo);
+  root.appendChild(footer);
 
   mount.appendChild(root);
 }
