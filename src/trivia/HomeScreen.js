@@ -1,26 +1,4 @@
-Objetivo:
-quitar transparencia del logo de Lluvia de Ideas en el pie de HomeScreen.
-
-Acción:
-1. Ubicar el elemento/footer logo que usa isologo_negro.svg
-2. Eliminar cualquier:
-   - opacity menor a 1
-   - filter que lo aclare/desature
-   - clase o estilo inline que reduzca visibilidad
-3. Dejar:
-   - opacity: 1
-   - visibilidad normal
-4. Mantener:
-   - tamaño pequeño
-   - centrado
-   - posición en pie
-
-Entrega:
-- fragmento exacto del estilo corregido
-- confirmación de que no queda ninguna transparencia aplicada
-
-Commit:
-"refactor(trivia): remove transparency from footer logo"export function HomeScreen({ mount, onStart }) {
+export function HomeScreen({ mount, onStart }) {
   const root = document.createElement('div');
   root.style.display = 'flex';
   root.style.flexDirection = 'column';
@@ -279,7 +257,7 @@ Commit:
     }
   });
 
-  // Pie de página: logo Lluvia de Ideas con opacidad reducida
+  // Pie de página: logo Lluvia de Ideas sin transparencia
   const footer = document.createElement('div');
   footer.style.width = '100%';
   footer.style.display = 'flex';
