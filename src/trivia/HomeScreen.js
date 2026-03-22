@@ -133,15 +133,14 @@ export function HomeScreen({ mount, onStart }) {
   });
 
   // Caras del cubo (mapping: 1-front, 2-back, 3-right, 4-left, 5-top, 6-bottom)
-  // Corrected transforms and backface-visibility for all faces
+  // Todas las caras orientadas hacia afuera, sin espejar, y visibles
   const faces = [
-    // Each face is oriented so that text is always readable from the front
     {name: 'front',  num: 1, transform: 'rotateY(0deg) translateZ(1.15em)'},
-    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.15em) rotateZ(180deg)'},
-    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.15em) rotateY(180deg)'},
-    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.15em) rotateY(180deg)'},
-    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.15em) rotateX(180deg)'},
-    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.15em) rotateX(180deg)'}
+    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.15em)'},
+    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.15em)'},
+    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.15em)'},
+    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.15em)'},
+    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.15em)'}
   ];
   faces.forEach(face => {
     const f = document.createElement('div');
@@ -183,12 +182,14 @@ export function HomeScreen({ mount, onStart }) {
     6: 'rotateX(90deg) rotateY(0deg)'     // bottom
   };
 
-  // Estado de rotación acumulada
-  let rollCount = 0;
+  // Estado de rotación acumulada y bloqueo de animación
   let lastX = 0, lastY = 0;
-  cube.addEventListener('click', () => {
+  let animating = false;
+  function rollDice() {
+    if (animating) return;
     const nextIdx = rollInputs.findIndex(inp => !inp.value);
     if (nextIdx === -1) return;
+    animating = true;
     const value = Math.floor(Math.random() * 6) + 1;
     // Elegir vueltas aleatorias previas
     const extraTurnsX = Math.floor(Math.random() * 3) + 2; // 2-4 vueltas
@@ -203,16 +204,22 @@ export function HomeScreen({ mount, onStart }) {
       case 5: finalX = -90; finalY = 0; break;
       case 6: finalX = 90; finalY = 0; break;
     }
-    // Acumular vueltas
-    lastX += 360 * extraTurnsX + finalX - (lastX % 360);
-    lastY += 360 * extraTurnsY + finalY - (lastY % 360);
+    // Normalizar para evitar acumulación corrupta
+    lastX = (lastX % 360) + 360 * extraTurnsX + finalX;
+    lastY = (lastY % 360) + 360 * extraTurnsY + finalY;
     cube.style.transition = 'transform 1.45s cubic-bezier(.4,1.4,.6,1)';
     cube.style.transform = `rotateX(${lastX}deg) rotateY(${lastY}deg) translateZ(-0.35em)`;
-    // Llenar casilla tras animación
     setTimeout(() => {
       rollInputs[nextIdx].value = value;
       updateViewBtn();
+      animating = false;
     }, 1450);
+  }
+  // Solo click/pointerup, nunca mousedown
+  cube.addEventListener('click', rollDice);
+  cube.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse' && e.pointerType !== 'touch') return;
+    rollDice();
   });
 
   // Si el usuario edita manualmente, restaurar cubo a cara 1
