@@ -87,24 +87,24 @@ export function HomeScreen({ mount, onStart }) {
   help.textContent = 'Puedes escribir el número manualmente si tiras un dado real, o usar el dado digital.';
   help.style.fontSize = '0.98rem';
   help.style.color = '#666';
-  help.style.marginBottom = '1.1rem';
+  help.style.marginBottom = '1.7rem';
   help.style.textAlign = 'center';
   root.appendChild(help);
 
-  // Dado digital animado
+
+  // Dado digital animado (cubo 3D refinado)
   const diceBlock = document.createElement('div');
   diceBlock.style.display = 'flex';
   diceBlock.style.flexDirection = 'column';
   diceBlock.style.alignItems = 'center';
-  diceBlock.style.marginBottom = '1.2rem';
+  diceBlock.style.marginBottom = '2.1rem';
 
-
-  // Cubo 3D para dado
+  // Cubo 3D refinado
   const scene = document.createElement('div');
-  scene.style.width = '3.2em';
-  scene.style.height = '3.2em';
+  scene.style.width = '2.3em';
+  scene.style.height = '2.3em';
   scene.style.perspective = '900px';
-  scene.style.margin = '0.2em 0 0.5em 0';
+  scene.style.margin = '0.1em 0 1.2em 0';
   scene.style.display = 'flex';
   scene.style.alignItems = 'center';
   scene.style.justifyContent = 'center';
@@ -114,56 +114,60 @@ export function HomeScreen({ mount, onStart }) {
   cube.style.height = '100%';
   cube.style.position = 'relative';
   cube.style.transformStyle = 'preserve-3d';
-  cube.style.transition = 'transform 0.6s cubic-bezier(.4,2,.6,1)';
-  cube.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(-0.5em)';
+  cube.style.transition = 'transform 1.45s cubic-bezier(.4,1.4,.6,1)';
+  cube.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(-0.35em)';
+  cube.style.cursor = 'pointer';
+
+  // Feedback hover/active
+  cube.addEventListener('mouseenter', () => {
+    cube.style.boxShadow = '0 0 0 3px #b3d6f7';
+  });
+  cube.addEventListener('mouseleave', () => {
+    cube.style.boxShadow = '';
+  });
+  cube.addEventListener('mousedown', () => {
+    cube.style.filter = 'brightness(0.96)';
+  });
+  cube.addEventListener('mouseup', () => {
+    cube.style.filter = '';
+  });
 
   // Caras del cubo (mapping: 1-front, 2-back, 3-right, 4-left, 5-top, 6-bottom)
   const faces = [
-    {name: 'front',  num: 1, transform: 'rotateY(0deg) translateZ(1.6em)'},
-    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.6em)'},
-    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.6em)'},
-    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.6em)'},
-    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.6em)'},
-    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.6em)'}
+    {name: 'front',  num: 1, transform: 'rotateY(0deg) translateZ(1.15em)'},
+    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.15em)'},
+    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.15em)'},
+    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.15em)'},
+    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.15em)'},
+    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.15em)'}
   ];
   faces.forEach(face => {
     const f = document.createElement('div');
     f.className = 'dice-face-' + face.name;
     f.textContent = face.num;
     f.style.position = 'absolute';
-    f.style.width = '3.2em';
-    f.style.height = '3.2em';
+    f.style.width = '2.3em';
+    f.style.height = '2.3em';
     f.style.display = 'flex';
     f.style.alignItems = 'center';
     f.style.justifyContent = 'center';
-    f.style.fontSize = '2.1em';
+    f.style.fontSize = '1.4em';
     f.style.fontWeight = 'bold';
     f.style.color = '#1a73e8';
     f.style.background = 'linear-gradient(145deg, #e3f0fa 60%, #b3d6f7 100%)';
-    f.style.border = '2.5px solid #1a73e8';
-    f.style.borderRadius = '0.7em';
-    f.style.boxShadow = '0 2px 10px #b3d6f7, 0 1px 0 #fff inset';
+    f.style.border = '2px solid #1a73e8';
+    f.style.borderRadius = '0.5em';
+    f.style.boxShadow = '0 2px 8px #b3d6f7, 0 1px 0 #fff inset';
     f.style.transform = face.transform;
     f.style.userSelect = 'none';
     cube.appendChild(f);
   });
   scene.appendChild(cube);
-  diceBlock.insertBefore(scene, diceBlock.firstChild);
+  diceBlock.appendChild(scene);
 
-  // Botón tirar dado
-  const diceBtn = document.createElement('button');
-  diceBtn.textContent = 'Tirar dado';
-  diceBtn.style.fontSize = '1.1rem';
-  diceBtn.style.padding = '0.6em 1.4em';
-  diceBtn.style.borderRadius = '8px';
-  diceBtn.style.background = '#1a73e8';
-  diceBtn.style.color = '#fff';
-  diceBtn.style.border = 'none';
-  diceBtn.style.fontWeight = '600';
-  diceBtn.style.cursor = 'pointer';
-  diceBtn.style.marginTop = '0.7em';
-  diceBlock.appendChild(diceBtn);
+  // El cubo es el trigger de tirada
   root.appendChild(diceBlock);
+
 
 
   // Mapping valor → rotación cubo
@@ -176,23 +180,44 @@ export function HomeScreen({ mount, onStart }) {
     6: 'rotateX(90deg) rotateY(0deg)'     // bottom
   };
 
-  diceBtn.addEventListener('click', () => {
+  // Estado de rotación acumulada
+  let rollCount = 0;
+  let lastX = 0, lastY = 0;
+  cube.addEventListener('click', () => {
     const nextIdx = rollInputs.findIndex(inp => !inp.value);
     if (nextIdx === -1) return;
     const value = Math.floor(Math.random() * 6) + 1;
-    // Animar cubo a la cara correspondiente
-    cube.style.transform = cubeRotations[value] + ' translateZ(-0.5em)';
+    // Elegir vueltas aleatorias previas
+    const extraTurnsX = Math.floor(Math.random() * 3) + 2; // 2-4 vueltas
+    const extraTurnsY = Math.floor(Math.random() * 3) + 2; // 2-4 vueltas
+    // Mapping final
+    let finalX = 0, finalY = 0;
+    switch (value) {
+      case 1: finalX = 0; finalY = 0; break;
+      case 2: finalX = 0; finalY = 180; break;
+      case 3: finalX = 0; finalY = -90; break;
+      case 4: finalX = 0; finalY = 90; break;
+      case 5: finalX = -90; finalY = 0; break;
+      case 6: finalX = 90; finalY = 0; break;
+    }
+    // Acumular vueltas
+    lastX += 360 * extraTurnsX + finalX - (lastX % 360);
+    lastY += 360 * extraTurnsY + finalY - (lastY % 360);
+    cube.style.transition = 'transform 1.45s cubic-bezier(.4,1.4,.6,1)';
+    cube.style.transform = `rotateX(${lastX}deg) rotateY(${lastY}deg) translateZ(-0.35em)`;
     // Llenar casilla tras animación
     setTimeout(() => {
       rollInputs[nextIdx].value = value;
       updateViewBtn();
-    }, 600);
+    }, 1450);
   });
 
   // Si el usuario edita manualmente, restaurar cubo a cara 1
   rollInputs.forEach(inp => {
     inp.addEventListener('focus', () => {
-      cube.style.transform = cubeRotations[1] + ' translateZ(-0.5em)';
+      lastX = 0; lastY = 0;
+      cube.style.transition = 'transform 0.5s cubic-bezier(.4,1.4,.6,1)';
+      cube.style.transform = cubeRotations[1] + ' translateZ(-0.35em)';
     });
   });
 
@@ -209,7 +234,7 @@ export function HomeScreen({ mount, onStart }) {
   viewBtn.style.border = 'none';
   viewBtn.style.fontWeight = '600';
   viewBtn.style.cursor = 'pointer';
-  viewBtn.style.marginTop = '0.5em';
+  viewBtn.style.marginTop = '1.2em';
   viewBtn.disabled = true;
   root.appendChild(viewBtn);
 
