@@ -183,37 +183,47 @@ export function HomeScreen({ mount, onStart }) {
   };
 
   // Estado de rotación acumulada y bloqueo de animación
+  // Dado determinista: rolledValue es la única fuente de verdad
   let lastX = 0, lastY = 0;
   let animating = false;
+  let rolledValue = null;
+  // Tabla canónica: valor → orientación final
+  const canonicalTransforms = {
+    1: {x: 0, y: 0},
+    2: {x: 0, y: 180},
+    3: {x: 0, y: -90},
+    4: {x: 0, y: 90},
+    5: {x: -90, y: 0},
+    6: {x: 90, y: 0}
+  };
   function rollDice() {
     if (animating) return;
     const nextIdx = rollInputs.findIndex(inp => !inp.value);
     if (nextIdx === -1) return;
     animating = true;
-    const value = Math.floor(Math.random() * 6) + 1;
-    // Elegir vueltas aleatorias previas
-    const extraTurnsX = Math.floor(Math.random() * 3) + 2; // 2-4 vueltas
-    const extraTurnsY = Math.floor(Math.random() * 3) + 2; // 2-4 vueltas
-    // Mapping final
-    let finalX = 0, finalY = 0;
-    switch (value) {
-      case 1: finalX = 0; finalY = 0; break;
-      case 2: finalX = 0; finalY = 180; break;
-      case 3: finalX = 0; finalY = -90; break;
-      case 4: finalX = 0; finalY = 90; break;
-      case 5: finalX = -90; finalY = 0; break;
-      case 6: finalX = 90; finalY = 0; break;
-    }
-    // Normalizar para evitar acumulación corrupta
-    lastX = (lastX % 360) + 360 * extraTurnsX + finalX;
-    lastY = (lastY % 360) + 360 * extraTurnsY + finalY;
-    cube.style.transition = 'transform 1.45s cubic-bezier(.4,1.4,.6,1)';
-    cube.style.transform = `rotateX(${lastX}deg) rotateY(${lastY}deg) translateZ(-0.35em)`;
+    rolledValue = Math.floor(Math.random() * 6) + 1; // PUNTO ÚNICO donde se define rolledValue
+    // Fase 1: animación libre (menos vueltas para máxima estabilidad)
+    const extraTurnsX = Math.floor(Math.random() * 2) + 1; // 1-2 vueltas
+    const extraTurnsY = Math.floor(Math.random() * 2) + 1; // 1-2 vueltas
+    const {x: finalX, y: finalY} = canonicalTransforms[rolledValue];
+    // Animación: vueltas libres
+    let animX = (lastX % 360) + 360 * extraTurnsX;
+    let animY = (lastY % 360) + 360 * extraTurnsY;
+    cube.style.transition = 'transform 1.1s cubic-bezier(.4,1.4,.6,1)';
+    cube.style.transform = `rotateX(${animX}deg) rotateY(${animY}deg) translateZ(-0.35em)`;
+    // Fase 2: snap exacto a la cara final
     setTimeout(() => {
-      rollInputs[nextIdx].value = value;
-      updateViewBtn();
-      animating = false;
-    }, 1450);
+      lastX = finalX;
+      lastY = finalY;
+      cube.style.transition = 'transform 0.35s cubic-bezier(.4,1.4,.6,1)';
+      cube.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg) translateZ(-0.35em)`;
+      // PUNTO ÚNICO donde se llena la celda con rolledValue
+      setTimeout(() => {
+        rollInputs[nextIdx].value = rolledValue;
+        updateViewBtn();
+        animating = false;
+      }, 350);
+    }, 1100);
   }
   // Solo click/pointerup, nunca mousedown
   cube.addEventListener('click', rollDice);
