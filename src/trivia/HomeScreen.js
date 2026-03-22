@@ -98,23 +98,57 @@ export function HomeScreen({ mount, onStart }) {
   diceBlock.style.alignItems = 'center';
   diceBlock.style.marginBottom = '1.2rem';
 
-  // Dado visual
-  const diceFace = document.createElement('div');
-  diceFace.style.width = '3.2em';
-  diceFace.style.height = '3.2em';
-  diceFace.style.background = 'linear-gradient(145deg, #e3f0fa 60%, #b3d6f7 100%)';
-  diceFace.style.border = '2.5px solid #1a73e8';
-  diceFace.style.borderRadius = '0.7em';
-  diceFace.style.boxShadow = '0 2px 10px #b3d6f7, 0 1px 0 #fff inset';
-  diceFace.style.display = 'flex';
-  diceFace.style.alignItems = 'center';
-  diceFace.style.justifyContent = 'center';
-  diceFace.style.fontSize = '2.1em';
-  diceFace.style.fontWeight = 'bold';
-  diceFace.style.color = '#1a73e8';
-  diceFace.style.transition = 'transform 0.35s cubic-bezier(.4,2,.6,1), box-shadow 0.2s';
-  diceFace.textContent = '🎲';
-  diceBlock.appendChild(diceFace);
+
+  // Cubo 3D para dado
+  const scene = document.createElement('div');
+  scene.style.width = '3.2em';
+  scene.style.height = '3.2em';
+  scene.style.perspective = '900px';
+  scene.style.margin = '0.2em 0 0.5em 0';
+  scene.style.display = 'flex';
+  scene.style.alignItems = 'center';
+  scene.style.justifyContent = 'center';
+
+  const cube = document.createElement('div');
+  cube.style.width = '100%';
+  cube.style.height = '100%';
+  cube.style.position = 'relative';
+  cube.style.transformStyle = 'preserve-3d';
+  cube.style.transition = 'transform 0.6s cubic-bezier(.4,2,.6,1)';
+  cube.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(-0.5em)';
+
+  // Caras del cubo (mapping: 1-front, 2-back, 3-right, 4-left, 5-top, 6-bottom)
+  const faces = [
+    {name: 'front',  num: 1, transform: 'rotateY(0deg) translateZ(1.6em)'},
+    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.6em)'},
+    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.6em)'},
+    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.6em)'},
+    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.6em)'},
+    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.6em)'}
+  ];
+  faces.forEach(face => {
+    const f = document.createElement('div');
+    f.className = 'dice-face-' + face.name;
+    f.textContent = face.num;
+    f.style.position = 'absolute';
+    f.style.width = '3.2em';
+    f.style.height = '3.2em';
+    f.style.display = 'flex';
+    f.style.alignItems = 'center';
+    f.style.justifyContent = 'center';
+    f.style.fontSize = '2.1em';
+    f.style.fontWeight = 'bold';
+    f.style.color = '#1a73e8';
+    f.style.background = 'linear-gradient(145deg, #e3f0fa 60%, #b3d6f7 100%)';
+    f.style.border = '2.5px solid #1a73e8';
+    f.style.borderRadius = '0.7em';
+    f.style.boxShadow = '0 2px 10px #b3d6f7, 0 1px 0 #fff inset';
+    f.style.transform = face.transform;
+    f.style.userSelect = 'none';
+    cube.appendChild(f);
+  });
+  scene.appendChild(cube);
+  diceBlock.insertBefore(scene, diceBlock.firstChild);
 
   // Botón tirar dado
   const diceBtn = document.createElement('button');
@@ -131,28 +165,34 @@ export function HomeScreen({ mount, onStart }) {
   diceBlock.appendChild(diceBtn);
   root.appendChild(diceBlock);
 
-  // Animación y lógica de dado
+
+  // Mapping valor → rotación cubo
+  const cubeRotations = {
+    1: 'rotateX(0deg) rotateY(0deg)',      // front
+    2: 'rotateX(0deg) rotateY(180deg)',   // back
+    3: 'rotateX(0deg) rotateY(-90deg)',   // right
+    4: 'rotateX(0deg) rotateY(90deg)',    // left
+    5: 'rotateX(-90deg) rotateY(0deg)',   // top
+    6: 'rotateX(90deg) rotateY(0deg)'     // bottom
+  };
+
   diceBtn.addEventListener('click', () => {
-    // Buscar la siguiente casilla vacía
     const nextIdx = rollInputs.findIndex(inp => !inp.value);
     if (nextIdx === -1) return;
-    // Animación 3D simple
-    diceFace.style.transform = 'rotateY(360deg) scale(1.12)';
-    diceFace.style.boxShadow = '0 4px 18px #b3d6f7, 0 1px 0 #fff inset';
+    const value = Math.floor(Math.random() * 6) + 1;
+    // Animar cubo a la cara correspondiente
+    cube.style.transform = cubeRotations[value] + ' translateZ(-0.5em)';
+    // Llenar casilla tras animación
     setTimeout(() => {
-      const value = Math.floor(Math.random() * 6) + 1;
-      diceFace.textContent = value;
-      diceFace.style.transform = 'rotateY(0deg) scale(1)';
-      diceFace.style.boxShadow = '0 2px 10px #b3d6f7, 0 1px 0 #fff inset';
       rollInputs[nextIdx].value = value;
       updateViewBtn();
-    }, 350);
+    }, 600);
   });
 
-  // Si el usuario edita manualmente, restaurar dado visual
+  // Si el usuario edita manualmente, restaurar cubo a cara 1
   rollInputs.forEach(inp => {
     inp.addEventListener('focus', () => {
-      diceFace.textContent = '🎲';
+      cube.style.transform = cubeRotations[1] + ' translateZ(-0.5em)';
     });
   });
 
