@@ -5,22 +5,27 @@ export function HomeScreen({ mount, onStart }) {
 
   // Logo principal
   const logo = document.createElement('img');
-  logo.src = '/assets/logo_impactoambiental.gif';
+  logo.src = './assets/logo_impactoambiental.gif';
   logo.alt = 'Impacto Ambiental';
   logo.className = 'home-logo';
   root.appendChild(logo);
 
-  // Subtítulo
+  // Título
   const subtitle = document.createElement('h2');
   subtitle.className = 'home-subtitle';
   subtitle.textContent = 'Guía de Cuestiones 2.0';
   root.appendChild(subtitle);
 
-  // Contenedor de controles
-  const controls = document.createElement('div');
-  controls.className = 'home-controls';
+  // Texto introductorio
+  const intro = document.createElement('div');
+  intro.className = 'home-intro';
+  intro.innerHTML = `
+    <p>Bienvenido a la Guía de Cuestiones 2.0.<br>
+    Selecciona tus casillas, lanza el dado y explora preguntas para reflexionar sobre el impacto ambiental.</p>
+  `;
+  root.appendChild(intro);
 
-  // Inputs 1–6
+  // Celdas de entrada
   const inputBox = document.createElement('div');
   inputBox.className = 'home-input-box';
   const inputs = [];
@@ -35,15 +40,15 @@ export function HomeScreen({ mount, onStart }) {
     inputBox.appendChild(input);
     inputs.push(input);
   }
-  controls.appendChild(inputBox);
+  root.appendChild(inputBox);
 
-  // Dado 3D single-axis
+  // Dado 3D
   const diceContainer = document.createElement('div');
   diceContainer.className = 'dice-container';
   const dice = document.createElement('div');
   dice.className = 'dice';
   diceContainer.appendChild(dice);
-  controls.appendChild(diceContainer);
+  root.appendChild(diceContainer);
 
   // Caras del dado (single-axis, X)
   const faces = [
@@ -71,18 +76,57 @@ export function HomeScreen({ mount, onStart }) {
     animating = true;
     const from = currentValue;
     const to = toValue;
-    const diff = ((to - from + 6) % 6);
-    const base = (from - 1) * 90;
-    const target = base - diff * 90;
-    dice.style.transition = 'transform 0.7s cubic-bezier(.25,1.5,.5,1)';
-    dice.style.transform = `rotateX(${target}deg)`;
-    setTimeout(() => {
-      currentValue = to;
-      animating = false;
-    }, 700);
+    let base = (from - 1) * 90;
+    let diff = ((to - from + 6) % 6);
+    let target = base - diff * 90;
+    // If rolling the same value, force a quick reset to a different face, then animate to the target
+    if (from === to) {
+      // Pick a temporary face (always different)
+      const temp = (from % 6) + 1;
+      const tempBase = (from - 1) * 90;
+      const tempDiff = ((temp - from + 6) % 6);
+      const tempTarget = tempBase - tempDiff * 90;
+      dice.style.transition = 'none';
+      dice.style.transform = `rotateX(${tempTarget}deg)`;
+      // Force reflow
+      void dice.offsetWidth;
+      setTimeout(() => {
+        dice.style.transition = 'transform 0.7s cubic-bezier(.25,1.5,.5,1)';
+        dice.style.transform = `rotateX(${base}deg)`;
+        setTimeout(() => {
+          dice.style.transform = `rotateX(${target}deg)`;
+          setTimeout(() => {
+            currentValue = to;
+            animating = false;
+          }, 700);
+        }, 20);
+      }, 20);
+    } else {
+      dice.style.transition = 'transform 0.7s cubic-bezier(.25,1.5,.5,1)';
+      dice.style.transform = `rotateX(${target}deg)`;
+      setTimeout(() => {
+        currentValue = to;
+        animating = false;
+      }, 700);
+    }
   }
 
-  // Botón "Ver pregunta"
+  // Interacción: click en el dado genera valor aleatorio, anima y carga casilla
+  diceContainer.style.cursor = 'pointer';
+  diceContainer.title = 'Lanzar dado';
+  diceContainer.onclick = () => {
+    const rolledValue = Math.floor(Math.random() * 6) + 1;
+    rollDice(rolledValue);
+    // Cargar en la siguiente casilla vacía (de izquierda a derecha)
+    for (let i = 0; i < inputs.length; i++) {
+      if (!inputs[i].value || isNaN(parseInt(inputs[i].value, 10)) || inputs[i].value === '' || inputs[i].value === '0') {
+        inputs[i].value = rolledValue;
+        break;
+      }
+    }
+  };
+
+  // Botón "Ver pregunta" solo navega
   const button = document.createElement('button');
   button.className = 'home-btn';
   button.textContent = 'Ver pregunta';
@@ -94,29 +138,20 @@ export function HomeScreen({ mount, onStart }) {
       input.value = v;
       return v;
     });
-    rollDice(values[0]);
-    // Aquí se puede agregar lógica para mostrar la pregunta
+    const generatedNumber = Number(values.join(''));
+    if (typeof onStart === 'function') {
+      onStart(generatedNumber);
+    }
   };
-  controls.appendChild(button);
-
-  root.appendChild(controls);
-
-  // Texto introductorio final
-  const intro = document.createElement('div');
-  intro.className = 'home-intro';
-  intro.innerHTML = `
-    <p>Bienvenido a la Guía de Cuestiones 2.0.<br>
-    Selecciona tus casillas, lanza el dado y explora preguntas para reflexionar sobre el impacto ambiental.</p>
-  `;
-  root.appendChild(intro);
+  root.appendChild(button);
 
   // Footer con isologo
   const footer = document.createElement('footer');
   footer.className = 'home-footer';
   const isologo = document.createElement('img');
-  isologo.src = '/assets/isologo_negro.svg';
+  isologo.src = './assets/isologo_negro.svg';
   isologo.alt = 'Isologo';
-  isologo.className = 'footer-isologo';
+  isologo.className = 'footer-isologo prominent';
   footer.appendChild(isologo);
   root.appendChild(footer);
 
@@ -126,20 +161,37 @@ export function HomeScreen({ mount, onStart }) {
   // CSS mínimo (puede moverse a styles.css)
   const style = document.createElement('style');
   style.textContent = `
-    .home-root { font-family: system-ui, sans-serif; max-width: 420px; margin: 0 auto; padding: 24px 8px 0 8px; background: #fff; border-radius: 18px; box-shadow: 0 2px 16px #0001; }
-    .home-logo { display: block; margin: 0 auto 12px auto; width: 120px; }
-    .home-subtitle { text-align: center; font-size: 1.3rem; margin: 0 0 18px 0; color: #1a2a2a; }
-    .home-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 12px; }
-    .home-input-box { display: flex; gap: 8px; }
+    .home-root {
+      font-family: system-ui, sans-serif;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 16px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      min-height: 100vh;
+      box-sizing: border-box;
+      justify-content: center;
+    }
+    .home-logo {
+      display: block;
+      margin: 0 auto;
+      width: 180px;
+      max-width: 90vw;
+    }
+    .home-subtitle { text-align: center; font-size: 1.5rem; margin: 0; color: #1a2a2a; }
+    .home-intro { text-align: center; color: #2a2a2a; font-size: 1.05rem; margin: 0; }
+    .home-input-box { display: flex; gap: 8px; justify-content: center; }
     .home-input { width: 36px; font-size: 1.1rem; text-align: center; border: 1px solid #bbb; border-radius: 6px; padding: 4px; }
-    .dice-container { perspective: 400px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+    .dice-container { perspective: 400px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
     .dice { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(.25,1.5,.5,1); }
     .dice-face { position: absolute; width: 100px; height: 100px; background: #fff; border: 2px solid #1a2a2a; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; color: #1a2a2a; box-shadow: 0 2px 8px #0002; }
-    .home-btn { background: #1a2a2a; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
+    .home-btn { background: #1a2a2a; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; margin-top: 0; }
     .home-btn:hover { background: #2e4a4a; }
-    .home-intro { margin: 18px 0 0 0; text-align: center; color: #2a2a2a; font-size: 1.05rem; }
-    .home-footer { margin-top: 28px; text-align: center; }
-    .footer-isologo { width: 80px; opacity: 1; filter: none; }
+    .home-footer { margin-top: 28px; text-align: center; width: 100%; }
+    .footer-isologo.prominent { display: block; margin: 0 auto; width: 110px; max-width: 60vw; opacity: 1; filter: none; }
   `;
   document.head.appendChild(style);
 }
