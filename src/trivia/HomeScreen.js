@@ -100,14 +100,14 @@ export function HomeScreen({ mount, onStart }) {
     help.style.textAlign = 'center';
     root.appendChild(help);
 
-    // Dado digital animado (cubo 3D refinado)
+    // Dado digital animado (cubo 3D simplificado, un solo eje)
     const diceBlock = document.createElement('div');
     diceBlock.style.display = 'flex';
     diceBlock.style.flexDirection = 'column';
     diceBlock.style.alignItems = 'center';
     diceBlock.style.marginBottom = '2.1rem';
 
-    // Cubo 3D refinado
+    // Cubo 3D
     const scene = document.createElement('div');
     scene.style.width = '2.3em';
     scene.style.height = '2.3em';
@@ -205,7 +205,6 @@ export function HomeScreen({ mount, onStart }) {
         targetX = finalX;
         targetY = finalY + 360;
       }
-      // Fórmula final: una vuelta en el eje elegido + orientación final
       cube.style.transition = 'transform 1.1s cubic-bezier(.4,1.4,.6,1)';
       cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg) translateZ(-0.35em)`;
       setTimeout(() => {
