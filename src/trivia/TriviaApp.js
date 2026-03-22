@@ -6,7 +6,9 @@ export function TriviaApp(root) {
   let questionNumber = null;
 
   function handleStart(number) {
-    questionNumber = number;
+    const normalizedNumber = Number(number);
+    console.log('TriviaApp: typeof questionNumber', typeof normalizedNumber, normalizedNumber); // evidencia
+    questionNumber = normalizedNumber;
     screen = "game";
     render();
   }

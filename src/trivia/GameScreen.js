@@ -9,6 +9,7 @@ export function GameScreen({ mount, questionNumber, onBack }) {
   root.style.minHeight = '480px';
 
   const q = questions.find(q => q.id === questionNumber);
+  console.log('GameScreen: typeof questionNumber', typeof questionNumber, questionNumber); // evidencia
 
   if (!q) {
     const nf = document.createElement('div');
