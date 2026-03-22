@@ -1,4 +1,26 @@
-export function HomeScreen({ mount, onStart }) {
+Objetivo:
+quitar transparencia del logo de Lluvia de Ideas en el pie de HomeScreen.
+
+Acción:
+1. Ubicar el elemento/footer logo que usa isologo_negro.svg
+2. Eliminar cualquier:
+   - opacity menor a 1
+   - filter que lo aclare/desature
+   - clase o estilo inline que reduzca visibilidad
+3. Dejar:
+   - opacity: 1
+   - visibilidad normal
+4. Mantener:
+   - tamaño pequeño
+   - centrado
+   - posición en pie
+
+Entrega:
+- fragmento exacto del estilo corregido
+- confirmación de que no queda ninguna transparencia aplicada
+
+Commit:
+"refactor(trivia): remove transparency from footer logo"export function HomeScreen({ mount, onStart }) {
   const root = document.createElement('div');
   root.style.display = 'flex';
   root.style.flexDirection = 'column';
@@ -133,13 +155,15 @@ export function HomeScreen({ mount, onStart }) {
   });
 
   // Caras del cubo (mapping: 1-front, 2-back, 3-right, 4-left, 5-top, 6-bottom)
+  // Corrected transforms and backface-visibility for all faces
   const faces = [
+    // Each face is oriented so that text is always readable from the front
     {name: 'front',  num: 1, transform: 'rotateY(0deg) translateZ(1.15em)'},
-    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.15em)'},
-    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.15em)'},
-    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.15em)'},
-    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.15em)'},
-    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.15em)'}
+    {name: 'back',   num: 2, transform: 'rotateY(180deg) translateZ(1.15em) rotateZ(180deg)'},
+    {name: 'right',  num: 3, transform: 'rotateY(90deg) translateZ(1.15em) rotateY(180deg)'},
+    {name: 'left',   num: 4, transform: 'rotateY(-90deg) translateZ(1.15em) rotateY(180deg)'},
+    {name: 'top',    num: 5, transform: 'rotateX(90deg) translateZ(1.15em) rotateX(180deg)'},
+    {name: 'bottom', num: 6, transform: 'rotateX(-90deg) translateZ(1.15em) rotateX(180deg)'}
   ];
   faces.forEach(face => {
     const f = document.createElement('div');
@@ -160,6 +184,7 @@ export function HomeScreen({ mount, onStart }) {
     f.style.boxShadow = '0 2px 8px #b3d6f7, 0 1px 0 #fff inset';
     f.style.transform = face.transform;
     f.style.userSelect = 'none';
+    f.style.backfaceVisibility = 'hidden';
     cube.appendChild(f);
   });
   scene.appendChild(cube);
@@ -266,7 +291,8 @@ export function HomeScreen({ mount, onStart }) {
   lluviaLogo.style.height = '38px';
   lluviaLogo.style.maxWidth = '180px';
   lluviaLogo.style.objectFit = 'contain';
-  lluviaLogo.style.opacity = '0.28';
+  lluviaLogo.style.opacity = '1';
+  lluviaLogo.style.filter = '';
   footer.appendChild(lluviaLogo);
   root.appendChild(footer);
 
