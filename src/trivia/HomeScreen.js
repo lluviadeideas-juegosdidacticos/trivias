@@ -194,23 +194,26 @@ export function HomeScreen({ mount, onStart }) {
       if (nextIdx === -1) return;
       animating = true;
       rolledValue = Math.floor(Math.random() * 6) + 1;
-      const extraTurnsX = Math.floor(Math.random() * 2) + 1;
-      const extraTurnsY = Math.floor(Math.random() * 2) + 1;
+      // Elegir eje al azar
+      const axis = Math.random() < 0.5 ? 'x' : 'y';
       const {x: finalX, y: finalY} = canonicalTransforms[rolledValue];
-      let animX = (lastX % 360) + 360 * extraTurnsX;
-      let animY = (lastY % 360) + 360 * extraTurnsY;
+      let targetX = 0, targetY = 0;
+      if (axis === 'x') {
+        targetX = finalX + 360;
+        targetY = finalY;
+      } else {
+        targetX = finalX;
+        targetY = finalY + 360;
+      }
+      // Fórmula final: una vuelta en el eje elegido + orientación final
       cube.style.transition = 'transform 1.1s cubic-bezier(.4,1.4,.6,1)';
-      cube.style.transform = `rotateX(${animX}deg) rotateY(${animY}deg) translateZ(-0.35em)`;
+      cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg) translateZ(-0.35em)`;
       setTimeout(() => {
         lastX = finalX;
         lastY = finalY;
-        cube.style.transition = 'transform 0.35s cubic-bezier(.4,1.4,.6,1)';
-        cube.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg) translateZ(-0.35em)`;
-        setTimeout(() => {
-          rollInputs[nextIdx].value = rolledValue;
-          updateViewBtn();
-          animating = false;
-        }, 350);
+        rollInputs[nextIdx].value = rolledValue;
+        updateViewBtn();
+        animating = false;
       }, 1100);
     }
     cube.addEventListener('click', rollDice);
