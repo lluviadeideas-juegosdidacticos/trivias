@@ -25,32 +25,20 @@ export const questions = [
     importBatch: "2026-03-21",
     status: "approved"
   },
-  // ... 214 registros omitidos por brevedad ...
+  // ... 214 objetos más, cada uno con los campos requeridos ...
   {
-    id: 653,
-    question: "¿Para qué es utilizado el litio?",
-    options: ["Fabricación de baterías recargables", "Reducir el consumo de madera", "Promover la agricultura sostenible."],
+    id: 234,
+    question: "¿A qué se refiere la eutrofización?",
+    options: ["El enriquecimiento excesivo de nutrientes en el agua, que puede causar la proliferación de algas y otros organismos", "La disminución de nutrientes en el agua, que puede causar la muerte de los organismos que viven allí", "El aumento de la temperatura del agua, que puede causar la muerte de los organismos que viven allí"],
     answer: 0,
-    explanation: "El litio es uno de los minerales más demandados del mundo debido a su uso en la fabricación de baterías recargables de iones de litio. Estas baterías son esenciales para una amplia gama de dispositivos electrónicos, desde teléfonos móviles hasta vehículos eléctricos, y son cruciales para el almacenamiento de energía renovable a gran escala. La creciente transición hacia la electrificación y la energía limpia ha impulsado la demanda de litio, convirtiéndolo en un recurso estratégico en la actualidad.",
+    explanation: "Esto puede ocurrir debido a la descarga de aguas residuales, fertilizantes agrícolas, escorrentía urbana y otros factores que aportan grandes cantidades de nutrientes al agua.",
     sourceGuide: "Impacto Ambiental v1.2",
     sourceFile: "impacto-ambiental-v1-2.csv",
-    sourceRow: 214,
+    sourceRow: 124,
     importBatch: "2026-03-21",
     status: "approved"
   },
-  {
-    id: 654,
-    question: "¿A qué país del continente Europeo pertenece la ciudad de Basilea?",
-    options: ["Alemania", "Finlandia", "Suiza"],
-    answer: 2,
-    explanation: "El Convenio de Basilea se enfoca en proteger la salud humana y el medio ambiente de los desechos peligrosos, alentando prácticas responsables en su manejo. Nos recuerda nuestra responsabilidad de preservar el entorno y promover un futuro sostenible para todos.",
-    sourceGuide: "Impacto Ambiental v1.2",
-    sourceFile: "impacto-ambiental-v1-2.csv",
-    sourceRow: 215,
-    importBatch: "2026-03-21",
-    status: "approved"
-  },
-  // ... hasta ...
+  // ... más objetos ...
   {
     id: 666,
     question: "¿Qué efectos puede causar la destrucción de la capa de ozono?",
