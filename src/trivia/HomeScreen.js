@@ -1,4 +1,4 @@
-export function HomeScreen(mount) {
+export function HomeScreen({ mount, onStart }) {
   // Contenedor principal
   const root = document.createElement('div');
   root.className = 'home-root';
