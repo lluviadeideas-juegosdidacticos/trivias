@@ -41,43 +41,122 @@ export function HomeScreen({ mount, onStart }) {
   intro.style.whiteSpace = 'pre-line';
   root.appendChild(intro);
 
-  // Dado y celdas
-  let rolls = [];
+
+  // Casillas editables (inputs) y dado digital
+  let rollInputs = [];
   const diceDiv = document.createElement('div');
   diceDiv.style.display = 'flex';
   diceDiv.style.gap = '1em';
-  diceDiv.style.marginBottom = '1.2rem';
+  diceDiv.style.marginBottom = '0.7rem';
   root.appendChild(diceDiv);
 
   for (let i = 0; i < 3; i++) {
-    const box = document.createElement('div');
-    box.textContent = '-';
-    box.style.width = '2.5em';
-    box.style.height = '2.5em';
-    box.style.border = '2px solid #1a73e8';
-    box.style.borderRadius = '8px';
-    box.style.display = 'flex';
-    box.style.alignItems = 'center';
-    box.style.justifyContent = 'center';
-    box.style.fontSize = '1.5em';
-    box.style.background = '#f5faff';
-    diceDiv.appendChild(box);
-    rolls.push(box);
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 1;
+    input.inputMode = 'numeric';
+    input.pattern = '[1-6]';
+    input.style.width = '2.5em';
+    input.style.height = '2.5em';
+    input.style.border = '2px solid #1a73e8';
+    input.style.borderRadius = '8px';
+    input.style.display = 'flex';
+    input.style.alignItems = 'center';
+    input.style.justifyContent = 'center';
+    input.style.fontSize = '1.5em';
+    input.style.background = '#f5faff';
+    input.style.textAlign = 'center';
+    input.style.caretColor = '#1a73e8';
+    input.style.outline = 'none';
+    input.autocomplete = 'off';
+    input.value = '';
+    // Validar solo 1-6
+    input.addEventListener('input', (e) => {
+      let v = input.value;
+      if (!/^[1-6]?$/.test(v)) {
+        input.value = '';
+      }
+      updateViewBtn();
+    });
+    diceDiv.appendChild(input);
+    rollInputs.push(input);
   }
 
-  let rollCount = 0;
-  const rollBtn = document.createElement('button');
-  rollBtn.textContent = 'Tirar dado';
-  rollBtn.style.fontSize = '1.1rem';
-  rollBtn.style.padding = '0.6em 1.4em';
-  rollBtn.style.borderRadius = '8px';
-  rollBtn.style.background = '#1a73e8';
-  rollBtn.style.color = '#fff';
-  rollBtn.style.border = 'none';
-  rollBtn.style.fontWeight = '600';
-  rollBtn.style.cursor = 'pointer';
-  rollBtn.style.marginBottom = '1.2rem';
-  root.appendChild(rollBtn);
+  // Ayuda
+  const help = document.createElement('div');
+  help.textContent = 'Puedes escribir el número manualmente si tiras un dado real, o usar el dado digital.';
+  help.style.fontSize = '0.98rem';
+  help.style.color = '#666';
+  help.style.marginBottom = '1.1rem';
+  help.style.textAlign = 'center';
+  root.appendChild(help);
+
+  // Dado digital animado
+  const diceBlock = document.createElement('div');
+  diceBlock.style.display = 'flex';
+  diceBlock.style.flexDirection = 'column';
+  diceBlock.style.alignItems = 'center';
+  diceBlock.style.marginBottom = '1.2rem';
+
+  // Dado visual
+  const diceFace = document.createElement('div');
+  diceFace.style.width = '3.2em';
+  diceFace.style.height = '3.2em';
+  diceFace.style.background = 'linear-gradient(145deg, #e3f0fa 60%, #b3d6f7 100%)';
+  diceFace.style.border = '2.5px solid #1a73e8';
+  diceFace.style.borderRadius = '0.7em';
+  diceFace.style.boxShadow = '0 2px 10px #b3d6f7, 0 1px 0 #fff inset';
+  diceFace.style.display = 'flex';
+  diceFace.style.alignItems = 'center';
+  diceFace.style.justifyContent = 'center';
+  diceFace.style.fontSize = '2.1em';
+  diceFace.style.fontWeight = 'bold';
+  diceFace.style.color = '#1a73e8';
+  diceFace.style.transition = 'transform 0.35s cubic-bezier(.4,2,.6,1), box-shadow 0.2s';
+  diceFace.textContent = '🎲';
+  diceBlock.appendChild(diceFace);
+
+  // Botón tirar dado
+  const diceBtn = document.createElement('button');
+  diceBtn.textContent = 'Tirar dado';
+  diceBtn.style.fontSize = '1.1rem';
+  diceBtn.style.padding = '0.6em 1.4em';
+  diceBtn.style.borderRadius = '8px';
+  diceBtn.style.background = '#1a73e8';
+  diceBtn.style.color = '#fff';
+  diceBtn.style.border = 'none';
+  diceBtn.style.fontWeight = '600';
+  diceBtn.style.cursor = 'pointer';
+  diceBtn.style.marginTop = '0.7em';
+  diceBlock.appendChild(diceBtn);
+  root.appendChild(diceBlock);
+
+  // Animación y lógica de dado
+  diceBtn.addEventListener('click', () => {
+    // Buscar la siguiente casilla vacía
+    const nextIdx = rollInputs.findIndex(inp => !inp.value);
+    if (nextIdx === -1) return;
+    // Animación 3D simple
+    diceFace.style.transform = 'rotateY(360deg) scale(1.12)';
+    diceFace.style.boxShadow = '0 4px 18px #b3d6f7, 0 1px 0 #fff inset';
+    setTimeout(() => {
+      const value = Math.floor(Math.random() * 6) + 1;
+      diceFace.textContent = value;
+      diceFace.style.transform = 'rotateY(0deg) scale(1)';
+      diceFace.style.boxShadow = '0 2px 10px #b3d6f7, 0 1px 0 #fff inset';
+      rollInputs[nextIdx].value = value;
+      updateViewBtn();
+    }, 350);
+  });
+
+  // Si el usuario edita manualmente, restaurar dado visual
+  rollInputs.forEach(inp => {
+    inp.addEventListener('focus', () => {
+      diceFace.textContent = '🎲';
+    });
+  });
+
+  // ...el bloque de dado digital reemplaza el botón anterior...
 
   // Botón para ver pregunta
   const viewBtn = document.createElement('button');
@@ -90,24 +169,22 @@ export function HomeScreen({ mount, onStart }) {
   viewBtn.style.border = 'none';
   viewBtn.style.fontWeight = '600';
   viewBtn.style.cursor = 'pointer';
-  viewBtn.style.display = 'none';
+  viewBtn.style.marginTop = '0.5em';
+  viewBtn.disabled = true;
   root.appendChild(viewBtn);
 
-  rollBtn.addEventListener('click', () => {
-    if (rollCount < 3) {
-      const value = Math.floor(Math.random() * 6) + 1;
-      rolls[rollCount].textContent = value;
-      rollCount++;
-      if (rollCount === 3) {
-        rollBtn.disabled = true;
-        viewBtn.style.display = 'block';
-      }
-    }
-  });
+
+  // Habilitar botón solo si las 3 casillas tienen valores válidos
+  function updateViewBtn() {
+    const valid = rollInputs.every(inp => /^[1-6]$/.test(inp.value));
+    viewBtn.disabled = !valid;
+  }
+  rollInputs.forEach(inp => inp.addEventListener('input', updateViewBtn));
 
   viewBtn.addEventListener('click', () => {
-    if (rollCount === 3) {
-      const generatedNumber = parseInt(rolls.map(b => b.textContent).join(''), 10);
+    const valid = rollInputs.every(inp => /^[1-6]$/.test(inp.value));
+    if (valid) {
+      const generatedNumber = parseInt(rollInputs.map(b => b.value).join(''), 10);
       onStart(generatedNumber);
     }
   });
