@@ -9,10 +9,20 @@ export function HomeScreen({ mount, onStart }) {
 
   // Logo Impacto Ambiental (encabezado)
   const logoImg = document.createElement('img');
-  logoImg.src = '/assets/logo_impactoambiental.gif';
+  // Preferir gif si existe, fallback a logo.svg
+  logoImg.src = './assets/logo_impactoambiental.gif';
   logoImg.alt = 'Impacto Ambiental';
   logoImg.style.width = '220px';
+  logoImg.style.maxWidth = '90vw';
+  logoImg.style.height = 'auto';
+  logoImg.style.objectFit = 'contain';
   logoImg.style.marginBottom = '0.7rem';
+  // fallback si no carga el gif
+  logoImg.onerror = function() {
+    logoImg.src = './assets/logo.svg';
+    logoImg.alt = 'Impacto Ambiental (SVG)';
+    logoImg.style.width = '120px';
+  };
   root.appendChild(logoImg);
 
   // Subtítulo
@@ -109,9 +119,11 @@ export function HomeScreen({ mount, onStart }) {
   footer.style.justifyContent = 'center';
   footer.style.marginTop = '2.5rem';
   const lluviaLogo = document.createElement('img');
-  lluviaLogo.src = '/assets/isologo_negro.svg';
+  lluviaLogo.src = './assets/isologo_negro.svg';
   lluviaLogo.alt = 'Lluvia de Ideas';
   lluviaLogo.style.height = '38px';
+  lluviaLogo.style.maxWidth = '180px';
+  lluviaLogo.style.objectFit = 'contain';
   lluviaLogo.style.opacity = '0.28';
   footer.appendChild(lluviaLogo);
   root.appendChild(footer);
