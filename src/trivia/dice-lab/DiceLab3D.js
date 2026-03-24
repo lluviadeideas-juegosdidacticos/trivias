@@ -20,6 +20,61 @@ export function DiceLab3D({ mount }) {
   renderer.setPixelRatio(window.devicePixelRatio);
   mount.appendChild(renderer.domElement);
 
+  // ── JANUS DIAGNOSTICS (TEMP) ──────────────────────────────────────────────
+  const _R2D = (r) => (typeof r === 'number' && !isNaN(r)) ? (r * 180 / Math.PI).toFixed(2) + '°' : '⚠NaN';
+  const _fmt = (v) => (typeof v === 'number' && !isNaN(v)) ? v.toFixed(4) : `⚠NaN(${v})`;
+
+  const _panel = document.createElement('div');
+  _panel.id = 'janus-dice-debug';
+  _panel.style.cssText = 'position:fixed;bottom:8px;right:8px;background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.6 monospace;padding:8px 10px;border-radius:6px;z-index:9999;white-space:pre;pointer-events:none;min-width:190px;';
+  document.body.appendChild(_panel);
+
+  function _updatePanel(label) {
+    const r = diceMesh.rotation;
+    const p = diceMesh.position;
+    _panel.textContent = [
+      '[JANUS] ' + label,
+      'face   : ' + rolledValue,
+      'rotX   : ' + _R2D(r.x),
+      'rotY   : ' + _R2D(r.y),
+      'rotZ   : ' + _R2D(r.z),
+      'posZ   : ' + _fmt(p.z),
+      'scene  : ' + scene.children.includes(diceMesh),
+      'visible: ' + diceMesh.visible,
+      'anim   : ' + isAnimating,
+    ].join('\n');
+  }
+
+  function _logState(label) {
+    const r = diceMesh.rotation;
+    const p = diceMesh.position;
+    const s = diceMesh.scale;
+    const inScene = scene.children.includes(diceMesh);
+    const _frustum = new THREE.Frustum();
+    const _m4 = new THREE.Matrix4();
+    camera.updateMatrixWorld();
+    _m4.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    _frustum.setFromProjectionMatrix(_m4);
+    diceMesh.geometry.computeBoundingBox();
+    const _bb = diceMesh.geometry.boundingBox.clone().applyMatrix4(diceMesh.matrixWorld);
+    const inFrustum = _frustum.intersectsBox(_bb);
+    const rotZBad = typeof r.z !== 'number' || isNaN(r.z);
+    console.group('[JANUS DICE] ' + label);
+    console.log('face/rolledValue :', rolledValue);
+    console.log('rotation rad     : x=%f  y=%f  z=%s', r.x, r.y, rotZBad ? '⚠NaN' : r.z);
+    console.log('rotation deg     : x=%s  y=%s  z=%s', _R2D(r.x), _R2D(r.y), _R2D(r.z));
+    console.log('position         : x=%f  y=%f  z=%f', p.x, p.y, p.z);
+    console.log('scale            : x=%f  y=%f  z=%f', s.x, s.y, s.z);
+    console.log('visible          :', diceMesh.visible);
+    console.log('inScene          :', inScene, '(children count:', scene.children.length, ')');
+    console.log('inFrustum        :', inFrustum);
+    console.log('camera.position  : x=%f  y=%f  z=%f', camera.position.x, camera.position.y, camera.position.z);
+    if (rotZBad) console.error('[JANUS DICE] ⚠ rotation.z is NaN — mesh will disappear');
+    console.groupEnd();
+    _updatePanel(label);
+  }
+  // ── END JANUS DIAGNOSTICS SETUP ───────────────────────────────────────────
+
   // Luz básica
   const light = new THREE.DirectionalLight(0xffffff, 1.1);
   light.position.set(2, 4, 5);
@@ -56,7 +111,6 @@ export function DiceLab3D({ mount }) {
     new THREE.LineBasicMaterial({ color: 0x000000 })
   );
   diceMesh.add(edgeLines);
-  scene.add(diceMesh);
 
   // Estado determinista
   // Fuente de verdad
@@ -65,7 +119,7 @@ export function DiceLab3D({ mount }) {
   // Mapeo valor → orientación absoluta (canónica, oblicua)
   // Orientación canónica: cada valor deja su cara al frente
   // Shared idle tilt (copied from previous good faces)
-  const idleTilt = { x: -0.35, y: 0.18 };
+  const idleTilt = { x: -0.3316, y: 0 };
 
   // Canonical orientation: puts correct face forward, no tilt
   function canonicalOrientationFor(value) {
@@ -102,6 +156,7 @@ export function DiceLab3D({ mount }) {
     diceMesh.rotation.y = o.y;
     rolledValue = value;
     renderer.render(scene, camera);
+    _logState('renderFace:' + phase + ':face=' + value);
     // Debug telemetry
     if (typeof window !== 'undefined') {
       if (!window.diceDebug) {
@@ -136,7 +191,9 @@ export function DiceLab3D({ mount }) {
   function animateTo(value) {
     if (value === rolledValue || isAnimating) return;
     isAnimating = true;
-    const from = { x: diceMesh.rotation.x, y: diceMesh.rotation.y };
+    // Tiny yaw jitter for realism (±0.04 rad)
+    orientationFor._jitter = (Math.random() - 0.5) * 0.08;
+    const from = { x: diceMesh.rotation.x, y: diceMesh.rotation.y, z: diceMesh.rotation.z };
     const to = orientationFor(value);
     // Vueltas aleatorias completas (mínimo 1, máximo 2.5) en ambos ejes
     const minTurns = 1, maxTurns = 2.5;
@@ -144,17 +201,38 @@ export function DiceLab3D({ mount }) {
     const turnsY = minTurns + Math.random() * (maxTurns - minTurns);
     const targetX = to.x + Math.PI * 2 * turnsX;
     const targetY = to.y + Math.PI * 2 * turnsY;
+    const targetZ = 0; // no roll — orientationFor returns no z, was undefined → NaN
+    // ── JANUS: log animation start and targetZ provenance ──
+    console.group('[JANUS DICE] animateTo:start face=' + value);
+    console.log('from             : x=%f  y=%f  z=%f', from.x, from.y, from.z);
+    console.log('to (orientationFor):', to, '  to.z =', to.z, typeof to.z === 'undefined' ? '⚠ UNDEFINED — will NaN rotation.z' : '');
+    console.log('targetX=%f  targetY=%f  targetZ=%s', targetX, targetY, targetZ === undefined ? '⚠undefined' : targetZ);
+    console.groupEnd();
+    // ──────────────────────────────────────────────────────
     const duration = 900;
     const start = performance.now();
+    let _frameCount = 0;
     function animate(now) {
       const t = Math.min((now - start) / duration, 1);
       // Ease in-out
       const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
       diceMesh.rotation.x = from.x + (targetX - from.x) * ease;
       diceMesh.rotation.y = from.y + (targetY - from.y) * ease;
+      diceMesh.rotation.z = from.z + (targetZ - from.z) * ease;
+      // ── JANUS: log first frame and NaN onset ──
+      if (_frameCount === 0) {
+        console.warn('[JANUS DICE] animate:frame=0  rotation.z =', diceMesh.rotation.z, isNaN(diceMesh.rotation.z) ? '⚠ NaN — DISAPPEAR ONSET' : 'ok');
+        _updatePanel('anim:frame0:face=' + value);
+      }
+      _frameCount++;
+      // ──────────────────────────────────────────
       renderer.render(scene, camera);
       if (t < 1) requestAnimationFrame(animate);
       else {
+        // ── JANUS: log last animation frame before renderFace ──
+        console.warn('[JANUS DICE] animate:last-frame  rotation.z =', diceMesh.rotation.z, isNaN(diceMesh.rotation.z) ? '⚠ NaN' : 'ok');
+        _logState('animateTo:landing:face=' + value);
+        // ──────────────────────────────────────────────────────
         renderFace(value);
         isAnimating = false;
       }
@@ -170,9 +248,16 @@ export function DiceLab3D({ mount }) {
     do {
       v = Math.floor(Math.random() * 6) + 1;
     } while (v === rolledValue);
+    // ── JANUS: log state at click, before animation starts ──
+    _logState('click:before-roll:currentFace=' + rolledValue + ':nextFace=' + v);
+    // ────────────────────────────────────────────────────────
     animateTo(v);
   });
 
   // Inicial: cara 1 (oblicua)
   renderFace(1, 'initial');
+  // ── JANUS: log scene children count (double-add check) ──
+  console.warn('[JANUS DICE] scene.children after init:', scene.children.length, '(expect 3: light + diceMesh×2 if double-add bug present)');
+  _logState('init-complete');
+  // ────────────────────────────────────────────────────────
 }
