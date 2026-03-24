@@ -23,7 +23,7 @@
     <script type="module">
       import { TriviaApp } from './src/trivia/TriviaApp.js';
       try {
-        TriviaApp(document.getElementById('app'));
+        TriviaApp({ mount: document.getElementById('app') });
       } catch (e) {
         document.body.innerHTML = "<pre style='color:red'>" + e.stack + "</pre>";
       }

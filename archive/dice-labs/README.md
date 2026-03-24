@@ -1,0 +1,1 @@
+This folder contains archived dice lab experiments that are no longer active. See dice-lab-3d.html and DiceLab3D.js for the current stable artifact.

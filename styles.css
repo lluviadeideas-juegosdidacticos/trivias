@@ -1,3 +1,73 @@
+/* HomeScreen branding refinement */
+.home-logo {
+	display: block;
+	margin: 0 auto 18px auto;
+	width: 270px;
+	max-width: 98vw;
+	filter: drop-shadow(0 2px 8px #0001);
+	transition: width 0.2s;
+}
+
+@media (max-width: 600px) {
+	.home-logo {
+		width: 170px;
+	}
+}
+
+.footer-isologo.prominent {
+	display: block;
+	margin: 0 auto 15px auto;
+	width: 170px;
+	max-width: 45vw;
+	opacity: 1;
+	filter: none;
+	transition: width 0.2s;
+}
+
+@media (min-width: 900px) {
+	.footer-isologo.prominent {
+		width: 180px;
+	}
+}
+
+@media (max-width: 600px) {
+	.footer-isologo.prominent {
+		width: 130px;
+	}
+}
+@media (max-width: 400px) {
+	.footer-isologo.prominent {
+		width: 110px;
+	}
+}
+
+.home-footer {
+	margin-top: 44px;
+	text-align: center;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0;
+}
+
+.footer-powered-by {
+	font-size: 0.92rem;
+	color: #222;
+	opacity: 0.58;
+	margin-top: 12px;
+	margin-bottom: 2px;
+	letter-spacing: 0.01em;
+	font-weight: 500;
+	text-align: center;
+	user-select: none;
+}
+
+@media (max-width: 600px) {
+	.footer-powered-by {
+		font-size: 0.82rem;
+	}
+}
 :root {
 	color-scheme: light;
 	--bg: #f6fafc;
@@ -269,21 +339,51 @@ body {
 	margin-bottom: 8px;
 }
 
-.input,
-.select {
-	width: 100%;
-	padding: 12px 14px;
-	border: 1px solid rgba(17, 24, 39, 0.14);
-	border-radius: 14px;
-	font-size: 1rem;
-	background: #fff;
-	color: var(--text);
-}
 
-.input:focus-visible,
-.select:focus-visible {
-	outline: 3px solid var(--focus);
-	outline-offset: 3px;
+/* Wheel Picker Styles (global) */
+.wheel-picker {
+	width: 48px;
+	height: 96px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 1px 3px #0001;
+	border: 1.5px solid #bbb;
+	overflow: hidden;
+	user-select: none;
+	touch-action: pan-y;
+	cursor: grab;
+}
+.wheel-value {
+	width: 100%;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.13rem;
+	color: #222;
+	opacity: 0.45;
+	transition: transform 0.13s cubic-bezier(.4,1.4,.6,1), opacity 0.13s, font-size 0.13s;
+	pointer-events: none;
+	font-weight: 500;
+	position: absolute;
+	left: 0;
+	top: calc(50% - 16px);
+	transform: translateY(0) scale(0.82);
+	z-index: 1;
+}
+.wheel-value.selected {
+	font-size: 1.32rem;
+	color: #111;
+	opacity: 1;
+	font-weight: 700;
+	z-index: 2;
+	text-shadow: 0 2px 8px #0001;
+	transform: translateY(-3px) scale(1.22) !important;
 }
 
 /* CONTENT */

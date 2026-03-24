@@ -26,6 +26,10 @@ export function TriviaApp({ mount }) {
   }
 
   function render() {
+    if (!mount) {
+      console.error("[TriviaApp] Mount node is missing. Cannot render app.");
+      return;
+    }
     mount.innerHTML = "";
     if (screen === "home") {
       HomeScreen({
