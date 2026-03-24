@@ -4,7 +4,7 @@ console.log("[JANUS DICE V2 MARKER]");
 // Laboratorio 3D limpio, determinista, sin overlays ni numeración
 import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
 
-export function DiceLab3D({ mount }) {
+export function DiceLab3D({ mount, onResult }) {
   // Escena
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf9fafb);
@@ -24,26 +24,6 @@ export function DiceLab3D({ mount }) {
   const _R2D = (r) => (typeof r === 'number' && !isNaN(r)) ? (r * 180 / Math.PI).toFixed(2) + '°' : '⚠NaN';
   const _fmt = (v) => (typeof v === 'number' && !isNaN(v)) ? v.toFixed(4) : `⚠NaN(${v})`;
 
-  const _panel = document.createElement('div');
-  _panel.id = 'janus-dice-debug';
-  _panel.style.cssText = 'position:fixed;bottom:8px;right:8px;background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.6 monospace;padding:8px 10px;border-radius:6px;z-index:9999;white-space:pre;pointer-events:none;min-width:190px;';
-  document.body.appendChild(_panel);
-
-  function _updatePanel(label) {
-    const r = diceMesh.rotation;
-    const p = diceMesh.position;
-    _panel.textContent = [
-      '[JANUS] ' + label,
-      'face   : ' + rolledValue,
-      'rotX   : ' + _R2D(r.x),
-      'rotY   : ' + _R2D(r.y),
-      'rotZ   : ' + _R2D(r.z),
-      'posZ   : ' + _fmt(p.z),
-      'scene  : ' + scene.children.includes(diceMesh),
-      'visible: ' + diceMesh.visible,
-      'anim   : ' + isAnimating,
-    ].join('\n');
-  }
 
   function _logState(label) {
     const r = diceMesh.rotation;
@@ -71,7 +51,7 @@ export function DiceLab3D({ mount }) {
     console.log('camera.position  : x=%f  y=%f  z=%f', camera.position.x, camera.position.y, camera.position.z);
     if (rotZBad) console.error('[JANUS DICE] ⚠ rotation.z is NaN — mesh will disappear');
     console.groupEnd();
-    _updatePanel(label);
+    // (debug overlay removed)
   }
   // ── END JANUS DIAGNOSTICS SETUP ───────────────────────────────────────────
 
@@ -128,10 +108,10 @@ export function DiceLab3D({ mount }) {
         return { x: 0, y: -Math.PI / 2 };
       case 2: // left
         return { x: 0, y: Math.PI / 2 };
-      case 3: // bottom
-        return { x: -Math.PI / 2, y: 0 };
-      case 4: // top
+      case 3: // top (was bottom, swap with 4)
         return { x: Math.PI / 2, y: 0 };
+      case 4: // bottom (was top, swap with 3)
+        return { x: -Math.PI / 2, y: 0 };
       case 5: // front
         return { x: 0, y: 0 };
       case 6: // back
@@ -222,7 +202,7 @@ export function DiceLab3D({ mount }) {
       // ── JANUS: log first frame and NaN onset ──
       if (_frameCount === 0) {
         console.warn('[JANUS DICE] animate:frame=0  rotation.z =', diceMesh.rotation.z, isNaN(diceMesh.rotation.z) ? '⚠ NaN — DISAPPEAR ONSET' : 'ok');
-        _updatePanel('anim:frame0:face=' + value);
+        // (debug overlay removed)
       }
       _frameCount++;
       // ──────────────────────────────────────────
@@ -235,6 +215,7 @@ export function DiceLab3D({ mount }) {
         // ──────────────────────────────────────────────────────
         renderFace(value);
         isAnimating = false;
+        if (typeof onResult === 'function') onResult(value);
       }
     }
     requestAnimationFrame(animate);

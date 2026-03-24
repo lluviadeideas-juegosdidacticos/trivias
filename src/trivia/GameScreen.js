@@ -37,20 +37,44 @@ export function GameScreen({ mount, questionNumber, onBack }) {
     return;
   }
 
-  const numDiv = document.createElement('div');
-  numDiv.textContent = `Pregunta Nº ${questionNumber}`;
-  numDiv.style.fontSize = '1.1rem';
-  numDiv.style.color = '#1a73e8';
-  numDiv.style.fontWeight = '600';
-  numDiv.style.marginBottom = '8px';
-  numDiv.style.textAlign = 'right';
-  root.appendChild(numDiv);
+  // Header: Pregunta N° X
+  const headerDiv = document.createElement('div');
+  headerDiv.textContent = `Pregunta N° ${questionNumber}`;
+  headerDiv.style.fontSize = '1.08rem';
+  headerDiv.style.fontWeight = '600';
+  headerDiv.style.letterSpacing = '0.03em';
+  headerDiv.style.color = '#1a73e8';
+  headerDiv.style.margin = '0 0 16px 0';
+  headerDiv.style.textAlign = 'center';
+  root.appendChild(headerDiv);
+
+  // Render intro text in a visually distinct box if present
+  if (q.intro && q.intro.trim() !== '') {
+    const introDiv = document.createElement('div');
+    introDiv.className = 'game-intro-box';
+    const introLabel = document.createElement('div');
+    introLabel.className = 'game-intro-label';
+    introLabel.textContent = 'Texto introductorio';
+    const introText = document.createElement('div');
+    introText.textContent = q.intro;
+    introText.style.fontSize = '1rem';
+    introText.style.color = '#444';
+    introText.style.margin = '0';
+    introText.style.lineHeight = '1.5';
+    introDiv.appendChild(introLabel);
+    introDiv.appendChild(introText);
+    root.appendChild(introDiv);
+  }
+
+  // ...question number now rendered as header above
 
   const qDiv = document.createElement('div');
   qDiv.textContent = q.question;
-  qDiv.style.fontSize = '1.5rem';
-  qDiv.style.fontWeight = '700';
+  qDiv.style.fontSize = '1.45rem';
+  qDiv.style.fontWeight = '800';
   qDiv.style.marginBottom = '1.5rem';
+  qDiv.style.textAlign = 'center';
+  qDiv.style.color = '#1a2a2a';
   root.appendChild(qDiv);
 
   const optsDiv = document.createElement('div');
@@ -67,8 +91,7 @@ export function GameScreen({ mount, questionNumber, onBack }) {
   root.appendChild(feedbackDiv);
 
   let explDiv = document.createElement('div');
-  explDiv.style.marginTop = '1em';
-  explDiv.style.color = '#444';
+  // Remove default explDiv styling; will use a contained box for final text
   root.appendChild(explDiv);
 
   q.options.forEach((opt, idx) => {
@@ -99,7 +122,24 @@ export function GameScreen({ mount, questionNumber, onBack }) {
       btn.style.color = '#fff';
       feedbackDiv.textContent = idx === q.answer ? '¡Correcto!' : 'Incorrecto';
       feedbackDiv.style.color = idx === q.answer ? '#43a047' : '#e53935';
-      explDiv.textContent = q.explanation;
+      // Render final/explanation text in a visually distinct box
+      explDiv.innerHTML = '';
+      if (q.explanation && q.explanation.trim() !== '') {
+        const finalDiv = document.createElement('div');
+        finalDiv.className = 'game-final-box';
+        const finalLabel = document.createElement('div');
+        finalLabel.className = 'game-final-label';
+        finalLabel.textContent = 'Reflexión final';
+        const finalText = document.createElement('div');
+        finalText.textContent = q.explanation;
+        finalText.style.fontSize = '1rem';
+        finalText.style.color = '#444';
+        finalText.style.margin = '0';
+        finalText.style.lineHeight = '1.5';
+        finalDiv.appendChild(finalLabel);
+        finalDiv.appendChild(finalText);
+        explDiv.appendChild(finalDiv);
+      }
       nextBtn.style.display = 'block';
       // Janus Observability: record STATE_TRANSITION on result update
       try {

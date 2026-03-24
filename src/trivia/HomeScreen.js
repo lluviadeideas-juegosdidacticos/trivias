@@ -1,5 +1,6 @@
 import { recordEvent } from "../../janus/observability/flight-recorder.js";
 import { USER_EVENT } from "../../janus/observability/runtime-events.js";
+import { DiceLab3D } from "./dice-lab/DiceLab3D.js";
 
 export function HomeScreen({ mount, onStart }) {
   // Contenedor principal
@@ -19,13 +20,11 @@ export function HomeScreen({ mount, onStart }) {
   subtitle.textContent = 'Guía de Cuestiones 2.0';
   root.appendChild(subtitle);
 
-  // Texto introductorio
+  // Home intro box with refined typography and text
   const intro = document.createElement('div');
-  intro.className = 'home-intro';
-  intro.innerHTML = `
-    <p>Bienvenido a la Guía de Cuestiones 2.0.<br>
-    Selecciona tus casillas, lanza el dado y explora preguntas para reflexionar sobre el impacto ambiental.</p>
-  `;
+  intro.className = 'home-intro-box';
+  intro.innerHTML = `La Guía de Cuestiones de Impacto Ambiental te invita a aprender jugando.<br>
+Elegí tres números o lanzá el dado: cada respuesta suma conciencia.`;
   root.appendChild(intro);
 
   // Celdas de entrada
@@ -131,10 +130,49 @@ export function HomeScreen({ mount, onStart }) {
     setSelected(1);
     return {
       container,
-      getValue: () => selected
+      getValue: () => selected,
+      setValue: (val) => {
+        const prev = selected;
+        setSelected(val);
+        // When value is unchanged, CSS transitions won't fire (no diff in inline style).
+        // Force a brief opacity pulse so the wheel visibly confirms the dice result.
+        if (val === prev) {
+          const el = valueEls[val - 1];
+          if (el) {
+            el.style.transition = 'none';
+            el.style.opacity = '0.45';
+            void el.offsetWidth; // flush layout so browser registers the change
+            el.style.transition = '';
+            el.style.opacity = '1';
+          }
+        }
+      },
     };
   }
 
+
+  // Sección dado 3D
+  const diceSection = document.createElement('div');
+  diceSection.className = 'home-dice-section';
+
+  const diceHint = document.createElement('p');
+  diceHint.className = 'home-dice-hint';
+  diceHint.textContent = 'O lanzá el dado para elegir tu pregunta';
+  diceSection.appendChild(diceHint);
+
+  const diceMount = document.createElement('div');
+  diceMount.className = 'home-dice-mount';
+  diceSection.appendChild(diceMount);
+  root.appendChild(diceSection);
+
+  let _nextWheel = 0;
+  DiceLab3D({
+    mount: diceMount,
+    onResult: (v) => {
+      wheels[_nextWheel].setValue(v);
+      _nextWheel = (_nextWheel + 1) % wheels.length;
+    },
+  });
 
   // Botón "Ver pregunta" solo navega
   const button = document.createElement('button');
@@ -320,6 +358,25 @@ export function HomeScreen({ mount, onStart }) {
       color: rgba(26,42,42,0.45);
       margin-top: 6px;
       letter-spacing: 0.04em;
+    }
+    .home-dice-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+    .home-dice-hint {
+      font-size: 0.92rem;
+      color: rgba(26,42,42,0.55);
+      margin: 0 0 12px 0;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    .home-dice-mount canvas {
+      display: block;
+      width: 200px !important;
+      height: 200px !important;
     }
   `;
   document.head.appendChild(style);

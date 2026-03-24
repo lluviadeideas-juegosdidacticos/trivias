@@ -24,6 +24,7 @@ const questions = records.map((row, idx) => {
     question: (row['PREGUNTA'] || '').trim(),
     options: options.map(opt => (opt || '').trim()),
     answer,
+    intro: (row['TEXTO INTRODUCTORIO'] || '').trim(),
     explanation: (row['TEXTO FINAL'] || '').trim(),
     // Metadatos mínimos para trazabilidad
     sourceGuide: 'Impacto Ambiental v1.2',
