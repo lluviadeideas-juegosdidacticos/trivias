@@ -23,8 +23,8 @@ export function HomeScreen({ mount, onStart }) {
   // Home intro box with refined typography and text
   const intro = document.createElement('div');
   intro.className = 'home-intro-box';
-  intro.innerHTML = `La Guía de Cuestiones de Impacto Ambiental te invita a aprender jugando.<br>
-Elegí tres números o lanzá el dado: cada respuesta suma conciencia.`;
+  intro.innerHTML = `La Guía de Cuestiones digital de Impacto Ambiental te invita a aprender jugando.<br>
+Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma conciencia.`;
   root.appendChild(intro);
 
   // Celdas de entrada

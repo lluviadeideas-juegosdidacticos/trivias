@@ -94,6 +94,7 @@ export function GameScreen({ mount, questionNumber, onBack }) {
   // Remove default explDiv styling; will use a contained box for final text
   root.appendChild(explDiv);
 
+  const optionButtons = [];
   q.options.forEach((opt, idx) => {
     const btn = document.createElement('button');
     btn.textContent = opt;
@@ -118,8 +119,21 @@ export function GameScreen({ mount, questionNumber, onBack }) {
           timestamp: Date.now(),
         });
       } catch (e) {}
-      btn.style.background = idx === q.answer ? '#43a047' : '#e53935';
-      btn.style.color = '#fff';
+
+      // Highlight logic for feedback
+      optionButtons.forEach((b, i) => {
+        if (i === q.answer) {
+          b.style.background = '#43a047';
+          b.style.color = '#fff';
+        } else if (i === selected && selected !== q.answer) {
+          b.style.background = '#e53935';
+          b.style.color = '#fff';
+        } else {
+          b.style.background = '#f5faff';
+          b.style.color = '#1a73e8';
+        }
+      });
+
       feedbackDiv.textContent = idx === q.answer ? '¡Correcto!' : 'Incorrecto';
       feedbackDiv.style.color = idx === q.answer ? '#43a047' : '#e53935';
       // Render final/explanation text in a visually distinct box
@@ -151,6 +165,7 @@ export function GameScreen({ mount, questionNumber, onBack }) {
         });
       } catch (e) {}
     });
+    optionButtons.push(btn);
     optsDiv.appendChild(btn);
   });
 
