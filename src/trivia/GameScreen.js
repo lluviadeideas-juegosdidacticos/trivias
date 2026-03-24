@@ -1,5 +1,8 @@
 import { questions } from "./data.js";
 
+import { recordEvent } from "../../janus/observability/flight-recorder.js";
+import * as events from "../../janus/observability/runtime-events.js";
+
 export function GameScreen({ mount, questionNumber, onBack }) {
   const root = document.createElement('div');
   root.style.display = 'flex';
@@ -82,12 +85,31 @@ export function GameScreen({ mount, questionNumber, onBack }) {
     btn.addEventListener('click', () => {
       if (selected !== null) return;
       selected = idx;
+      // Janus Observability: record USER_EVENT for answer
+      try {
+        recordEvent(events.USER_EVENT, {
+          action: 'answer',
+          questionId: q.id,
+          selected: idx,
+          correct: idx === q.answer,
+          timestamp: Date.now(),
+        });
+      } catch (e) {}
       btn.style.background = idx === q.answer ? '#43a047' : '#e53935';
       btn.style.color = '#fff';
       feedbackDiv.textContent = idx === q.answer ? '¡Correcto!' : 'Incorrecto';
       feedbackDiv.style.color = idx === q.answer ? '#43a047' : '#e53935';
       explDiv.textContent = q.explanation;
       nextBtn.style.display = 'block';
+      // Janus Observability: record STATE_TRANSITION on result update
+      try {
+        recordEvent(events.STATE_TRANSITION, {
+          questionId: q.id,
+          selected: idx,
+          correct: idx === q.answer,
+          timestamp: Date.now(),
+        });
+      } catch (e) {}
     });
     optsDiv.appendChild(btn);
   });
@@ -104,7 +126,17 @@ export function GameScreen({ mount, questionNumber, onBack }) {
   nextBtn.style.border = 'none';
   nextBtn.style.fontWeight = '600';
   nextBtn.style.cursor = 'pointer';
-  nextBtn.addEventListener('click', onBack);
+  nextBtn.addEventListener('click', () => {
+    // Janus Observability: record USER_EVENT for next
+    try {
+      recordEvent(events.USER_EVENT, {
+        action: 'next',
+        questionId: q.id,
+        timestamp: Date.now(),
+      });
+    } catch (e) {}
+    onBack();
+  });
   root.appendChild(nextBtn);
 
   mount.appendChild(root);

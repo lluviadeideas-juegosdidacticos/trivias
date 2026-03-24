@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>DiceLab3D</title>
+  <style>
+    body { background: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+    #mount { position: relative; }
+  </style>
+</head>
+  <body>
+    <div id="debug-panel" style="padding:12px;font-family:monospace;white-space:pre-wrap;background:#fff3cd;color:#222;border-bottom:1px solid #ddd;"></div>
+    <h2>Laboratorio Dado 3D (limpio)</h2>
+    <div id="app">
+      <div id="mount"></div>
+    </div>
+    <script type="module">
+      import('./src/trivia/dice-lab/DiceLab3D.js')
+        .then(mod => {
+          const app = document.getElementById('app');
+          // Minimal debug state/history
+          const diceDebug = {
+            _state: null,
+            _history: [],
+            getState() { return this._state; },
+            getHistory() { return this._history.slice(); }
+          };
+          window.diceDebug = diceDebug;
+          // Patch DiceLab3D to instrument resting pose
+          function instrumentedDiceLab3D(opts) {
+            let requestedFace = null;
+            const orig = mod.DiceLab3D;
+            function wrapRenderFace(origRenderFace) {
+              return function(value, phase) {
+                requestedFace = value;
+                origRenderFace.call(this, value);
+                const mesh = this && this.diceMesh ? this.diceMesh : (window.diceMesh || null);
+                const meshRef = mesh || (window.THREE && window.THREE.diceMesh);
+                const dice = meshRef || (window.diceMesh || null);
+                const rot = dice ? dice.rotation : (this && this.rotation ? this.rotation : null);
+                diceDebug._state = {
+                  requestedFace: value,
+                  rotationX: rot ? rot.x : NaN,
+                  rotationY: rot ? rot.y : NaN,
+                  rotationZ: rot ? rot.z : NaN,
+                  timestamp: Date.now(),
+                  phase: phase || 'final'
+                };
+                diceDebug._history.push({ ...diceDebug._state });
+              };
+            }
+            // Patch DiceLab3D to wrap renderFace
+            const proxy = function(opts) {
+              const result = orig.call(this, opts);
+              if (typeof result === 'object' && result !== null && result.renderFace) {
+                result.renderFace = wrapRenderFace(result.renderFace);
+              }
+              return result;
+            };
+            // Call original with patched renderFace
+            orig.call({
+              ...opts,
+              renderFace: wrapRenderFace(function(value) {
+                return mod.DiceLab3D.prototype.renderFace
+                  ? mod.DiceLab3D.prototype.renderFace.call(this, value)
+                  : undefined;
+              })
+            }, opts);
+          }
+          try {
+            instrumentedDiceLab3D({ mount: document.getElementById('mount') });
+          } catch (e) {
+            app.innerHTML =
+              '<pre style="color:red;white-space:pre-wrap">' +
+              (e && e.stack ? e.stack : e) +
+              '</pre>';
+          }
+        })
+        .catch(e => {
+          document.getElementById('app').innerHTML =
+            '<pre style="color:red;white-space:pre-wrap">' +
+            (e && e.stack ? e.stack : e) +
+            '</pre>';
+        });
+      window.onerror = function(msg, url, line, col, error) {
+        document.getElementById('app').innerHTML =
+          '<pre style="color:red;white-space:pre-wrap">' +
+          msg + '\n' + url + ':' + line + ':' + col + '\n' +
+          (error && error.stack ? error.stack : '') +
+          '</pre>';
+      };
+    </script>
+  </body>
+</html>

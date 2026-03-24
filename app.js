@@ -1,3 +1,15 @@
+import { TriviaApp } from "./src/trivia/TriviaApp.js";
+
+// Bootstrap: mount TriviaApp if #app exists
+const root = document.getElementById("app");
+if (root) {
+	TriviaApp({ mount: root });
+}
+import { recordEvent, getEvents } from "./janus/observability/flight-recorder.js";
+import * as events from "./janus/observability/runtime-events.js";
+// Temporary debug exposure for Janus observability event log
+window.getJanusEvents = getEvents;
+
 function setStatus(text) {
 	const statusEl = document.getElementById("app-status");
 	if (!statusEl) return;
@@ -728,6 +740,13 @@ function serveRandomQuestion() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+	// Janus Observability: record BUILD_INFO on app start
+	try {
+		recordEvent(events.BUILD_INFO, {
+			build: window.Janus?.build ?? "unknown",
+			date: new Date().toISOString(),
+		});
+	} catch (e) {}
 	setStatus("Listo para explorar.");
 	setResultCode("—");
 	setCardHidden("intro-card", true);
@@ -769,6 +788,13 @@ window.addEventListener("DOMContentLoaded", () => {
 			}
 		})
 		.catch((error) => {
+			// Janus Observability: record JS_ERROR on error
+			try {
+				recordEvent(events.JS_ERROR, {
+					message: error?.message,
+					stack: error?.stack,
+				});
+			} catch (e) {}
 			console.error(error);
 			setStatus("No se pudo cargar la base CSV local.");
 			updateJanusConsole();
