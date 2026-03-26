@@ -5,10 +5,19 @@ const root = document.getElementById("app");
 if (root) {
 	TriviaApp({ mount: root });
 }
+
 import { recordEvent, getEvents } from "./janus/observability/flight-recorder.js";
 import * as events from "./janus/observability/runtime-events.js";
-// Temporary debug exposure for Janus observability event log
-window.getJanusEvents = getEvents;
+
+// --- Security: HTML escaping helper ---
+function escHtml(s) {
+	return String(s)
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
+}
 
 function setStatus(text) {
 	const statusEl = document.getElementById("app-status");
@@ -159,10 +168,19 @@ function setAnswers(options) {
 	container.hidden = false;
 }
 
-function setAuditHtml(html) {
+// Harden: Only allow trusted HTML, escape CSV-derived values
+function setAuditHtml(html, isTrusted = false) {
 	const el = document.getElementById("audit-content");
 	if (!el) return;
-	el.innerHTML = html;
+	if (isTrusted) {
+		el.innerHTML = html;
+	} else {
+		// Render as preformatted text if not trusted
+		const pre = document.createElement("pre");
+		pre.textContent = html;
+		el.innerHTML = "";
+		el.appendChild(pre);
+	}
 }
 
 function parseCsv(text) {
@@ -495,20 +513,20 @@ function runAudit() {
 					.slice(0, 40)
 					.join("\n") + (correctDistinctRaw.size > 40 ? `\n… (+${correctDistinctRaw.size - 40})` : "");
 
-	setAuditHtml(`
-		<div class="audit-grid">
-			<div class="audit-metric"><span class="audit-key">Total de registros</span><span class="audit-value">${metrics.totalRecords}</span></div>
-			<div class="audit-metric"><span class="audit-key">Códigos únicos (ID JUEGO)</span><span class="audit-value">${metrics.uniqueCodes}</span></div>
-			<div class="audit-metric"><span class="audit-key">Códigos duplicados</span><span class="audit-value">${metrics.duplicateCodesCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Registros sin pregunta</span><span class="audit-value">${metrics.missingQuestionCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Registros sin respuesta correcta</span><span class="audit-value">${metrics.missingCorrectCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Registros sin tema</span><span class="audit-value">${metrics.missingTopicCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Registros sin subtema</span><span class="audit-value">${metrics.missingSubtopicCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Respuesta correcta inválida (no A/B/C)</span><span class="audit-value">${metrics.invalidCorrectValueCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Correcta sin texto en su opción</span><span class="audit-value">${metrics.correctOptionMissingTextCount}</span></div>
-			<div class="audit-metric"><span class="audit-key">Valores distintos en RESPUESTA CORRECTA</span><span class="audit-value">${metrics.correctDistinctValuesCount}</span></div>
-		</div>
-
+	       setAuditHtml(`
+		       <div class="audit-grid">
+			       <div class="audit-metric"><span class="audit-key">Total de registros</span><span class="audit-value">${escHtml(metrics.totalRecords)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Códigos únicos (ID JUEGO)</span><span class="audit-value">${escHtml(metrics.uniqueCodes)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Códigos duplicados</span><span class="audit-value">${escHtml(metrics.duplicateCodesCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Registros sin pregunta</span><span class="audit-value">${escHtml(metrics.missingQuestionCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Registros sin respuesta correcta</span><span class="audit-value">${escHtml(metrics.missingCorrectCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Registros sin tema</span><span class="audit-value">${escHtml(metrics.missingTopicCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Registros sin subtema</span><span class="audit-value">${escHtml(metrics.missingSubtopicCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Respuesta correcta inválida (no A/B/C)</span><span class="audit-value">${escHtml(metrics.invalidCorrectValueCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Correcta sin texto en su opción</span><span class="audit-value">${escHtml(metrics.correctOptionMissingTextCount)}</span></div>
+			       <div class="audit-metric"><span class="audit-key">Valores distintos en RESPUESTA CORRECTA</span><span class="audit-value">${escHtml(metrics.correctDistinctValuesCount)}</span></div>
+		       </div>`, true
+	       );
 		<div class="audit-list">
 			<p class="audit-list-title">Duplicados ID JUEGO (muestra)</p>
 			<pre class="audit-mono">${duplicateText}</pre>

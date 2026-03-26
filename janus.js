@@ -77,6 +77,7 @@
 
 			Janus.events.push(event);
 			updateDiagnostics();
+			Janus.debug = false; // Security: disable debug in production
 			if (Janus.debug) console.log("[Janus]", event);
 			notify(event);
 			return event;

@@ -13,11 +13,11 @@
     <div id="app"></div>
     <script>
       window.onerror = function (msg, url, line, col, error) {
-        document.body.innerHTML = "<pre style='color:red'>" +
-          msg + "\n" +
-          url + ":" + line + ":" + col +
-          "\n" + (error && error.stack) +
-        "</pre>";
+        document.body.innerHTML = '';
+        const pre = document.createElement('pre');
+        pre.style.color = 'red';
+        pre.textContent = `${msg}\n${url}:${line}:${col}\n${error && error.stack ? error.stack : ''}`;
+        document.body.appendChild(pre);
       };
     </script>
     <script type="module">
@@ -25,7 +25,11 @@
       try {
         TriviaApp({ mount: document.getElementById('app') });
       } catch (e) {
-        document.body.innerHTML = "<pre style='color:red'>" + e.stack + "</pre>";
+        document.body.innerHTML = '';
+        const pre = document.createElement('pre');
+        pre.style.color = 'red';
+        pre.textContent = e && e.stack ? e.stack : e;
+        document.body.appendChild(pre);
       }
     </script>
   </body>

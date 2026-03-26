@@ -25,7 +25,7 @@
             getState() { return this._state; },
             getHistory() { return this._history.slice(); }
           };
-          window.diceDebug = diceDebug;
+          // window.diceDebug = diceDebug; // Security: disabled debug exposure
           // Patch DiceLab3D to instrument resting pose
           function instrumentedDiceLab3D(opts) {
             let requestedFace = null;
@@ -70,24 +70,32 @@
           try {
             instrumentedDiceLab3D({ mount: document.getElementById('mount') });
           } catch (e) {
-            app.innerHTML =
-              '<pre style="color:red;white-space:pre-wrap">' +
-              (e && e.stack ? e.stack : e) +
-              '</pre>';
+            // Safer error rendering
+            app.innerHTML = '';
+            const pre = document.createElement('pre');
+            pre.style.color = 'red';
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.textContent = e && e.stack ? e.stack : e;
+            app.appendChild(pre);
           }
         })
         .catch(e => {
-          document.getElementById('app').innerHTML =
-            '<pre style="color:red;white-space:pre-wrap">' +
-            (e && e.stack ? e.stack : e) +
-            '</pre>';
+          const appEl = document.getElementById('app');
+          appEl.innerHTML = '';
+          const pre = document.createElement('pre');
+          pre.style.color = 'red';
+          pre.style.whiteSpace = 'pre-wrap';
+          pre.textContent = e && e.stack ? e.stack : e;
+          appEl.appendChild(pre);
         });
       window.onerror = function(msg, url, line, col, error) {
-        document.getElementById('app').innerHTML =
-          '<pre style="color:red;white-space:pre-wrap">' +
-          msg + '\n' + url + ':' + line + ':' + col + '\n' +
-          (error && error.stack ? error.stack : '') +
-          '</pre>';
+        const appEl = document.getElementById('app');
+        appEl.innerHTML = '';
+        const pre = document.createElement('pre');
+        pre.style.color = 'red';
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.textContent = `${msg}\n${url}:${line}:${col}\n${error && error.stack ? error.stack : ''}`;
+        appEl.appendChild(pre);
       };
     </script>
   </body>
