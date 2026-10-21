@@ -5,8 +5,8 @@ const FACE_ROTATIONS = Object.freeze({
   2: { x: 0, y: 180 },
   3: { x: 0, y: -90 },
   4: { x: 0, y: 90 },
-  5: { x: 90, y: 0 },
-  6: { x: -90, y: 0 },
+  5: { x: -90, y: 0 },
+  6: { x: 90, y: 0 },
 });
 
 export function faceRotationFor(value) {
