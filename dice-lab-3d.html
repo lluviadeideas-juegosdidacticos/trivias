@@ -1,102 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>DiceLab3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title>JanusDiceLab</title>
   <style>
-    body { background: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-    #mount { position: relative; }
+    body { background: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: system-ui, sans-serif; color: #1a2a2a; }
+    #mount { min-height: 200px; display: grid; place-items: center; }
+    #status { min-height: 1.5em; }
   </style>
 </head>
-  <body>
-    <div id="debug-panel" style="padding:12px;font-family:monospace;white-space:pre-wrap;background:#fff3cd;color:#222;border-bottom:1px solid #ddd;"></div>
-    <h2>Laboratorio Dado 3D (limpio)</h2>
-    <div id="app">
-      <div id="mount"></div>
-    </div>
-    <script type="module">
-      import('./src/trivia/dice-lab/DiceLab3D.js')
-        .then(mod => {
-          const app = document.getElementById('app');
-          // Minimal debug state/history
-          const diceDebug = {
-            _state: null,
-            _history: [],
-            getState() { return this._state; },
-            getHistory() { return this._history.slice(); }
-          };
-          // window.diceDebug = diceDebug; // Security: disabled debug exposure
-          // Patch DiceLab3D to instrument resting pose
-          function instrumentedDiceLab3D(opts) {
-            let requestedFace = null;
-            const orig = mod.DiceLab3D;
-            function wrapRenderFace(origRenderFace) {
-              return function(value, phase) {
-                requestedFace = value;
-                origRenderFace.call(this, value);
-                const mesh = this && this.diceMesh ? this.diceMesh : (window.diceMesh || null);
-                const meshRef = mesh || (window.THREE && window.THREE.diceMesh);
-                const dice = meshRef || (window.diceMesh || null);
-                const rot = dice ? dice.rotation : (this && this.rotation ? this.rotation : null);
-                diceDebug._state = {
-                  requestedFace: value,
-                  rotationX: rot ? rot.x : NaN,
-                  rotationY: rot ? rot.y : NaN,
-                  rotationZ: rot ? rot.z : NaN,
-                  timestamp: Date.now(),
-                  phase: phase || 'final'
-                };
-                diceDebug._history.push({ ...diceDebug._state });
-              };
-            }
-            // Patch DiceLab3D to wrap renderFace
-            const proxy = function(opts) {
-              const result = orig.call(this, opts);
-              if (typeof result === 'object' && result !== null && result.renderFace) {
-                result.renderFace = wrapRenderFace(result.renderFace);
-              }
-              return result;
-            };
-            // Call original with patched renderFace
-            orig.call({
-              ...opts,
-              renderFace: wrapRenderFace(function(value) {
-                return mod.DiceLab3D.prototype.renderFace
-                  ? mod.DiceLab3D.prototype.renderFace.call(this, value)
-                  : undefined;
-              })
-            }, opts);
-          }
-          try {
-            instrumentedDiceLab3D({ mount: document.getElementById('mount') });
-          } catch (e) {
-            // Safer error rendering
-            app.innerHTML = '';
-            const pre = document.createElement('pre');
-            pre.style.color = 'red';
-            pre.style.whiteSpace = 'pre-wrap';
-            pre.textContent = e && e.stack ? e.stack : e;
-            app.appendChild(pre);
-          }
-        })
-        .catch(e => {
-          const appEl = document.getElementById('app');
-          appEl.innerHTML = '';
-          const pre = document.createElement('pre');
-          pre.style.color = 'red';
-          pre.style.whiteSpace = 'pre-wrap';
-          pre.textContent = e && e.stack ? e.stack : e;
-          appEl.appendChild(pre);
-        });
-      window.onerror = function(msg, url, line, col, error) {
-        const appEl = document.getElementById('app');
-        appEl.innerHTML = '';
-        const pre = document.createElement('pre');
-        pre.style.color = 'red';
-        pre.style.whiteSpace = 'pre-wrap';
-        pre.textContent = `${msg}\n${url}:${line}:${col}\n${error && error.stack ? error.stack : ''}`;
-        appEl.appendChild(pre);
-      };
-    </script>
-  </body>
+<body>
+  <main>
+    <h1>JanusDiceLab</h1>
+    <p>Probá el dado interactivo.</p>
+    <div id="mount"></div>
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+  <script type="module" src="./src/trivia/dice-lab-demo.js"></script>
+</body>
 </html>

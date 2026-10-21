@@ -1,36 +1,16 @@
 <!doctype html>
-<!doctype html>
 <!-- trivia build: 2026-03-21 -->
 <!-- pages-redeploy: 2026-03-21-b -->
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
     <title>Explorá Impacto Ambiental | Lluvia de Ideas</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div id="app"></div>
-    <script>
-      window.onerror = function (msg, url, line, col, error) {
-        document.body.innerHTML = '';
-        const pre = document.createElement('pre');
-        pre.style.color = 'red';
-        pre.textContent = `${msg}\n${url}:${line}:${col}\n${error && error.stack ? error.stack : ''}`;
-        document.body.appendChild(pre);
-      };
-    </script>
-    <script type="module">
-      import { TriviaApp } from './src/trivia/TriviaApp.js';
-      try {
-        TriviaApp({ mount: document.getElementById('app') });
-      } catch (e) {
-        document.body.innerHTML = '';
-        const pre = document.createElement('pre');
-        pre.style.color = 'red';
-        pre.textContent = e && e.stack ? e.stack : e;
-        document.body.appendChild(pre);
-      }
-    </script>
+    <script type="module" src="./src/trivia/bootstrap.js"></script>
   </body>
 </html>
