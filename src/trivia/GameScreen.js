@@ -1,4 +1,5 @@
 import { questions } from "./data.js";
+import { trackQuestionPlayed } from "./analytics.js";
 
 import { recordEvent } from "../../janus/observability/flight-recorder.js";
 import * as events from "../../janus/observability/runtime-events.js";
@@ -36,6 +37,8 @@ export function GameScreen({ mount, questionNumber, onBack }) {
     mount.appendChild(root);
     return;
   }
+
+  trackQuestionPlayed(q.id);
 
   // Header: Pregunta N° X
   const headerDiv = document.createElement('div');

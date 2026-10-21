@@ -1,6 +1,7 @@
 import { recordEvent } from "../../janus/observability/flight-recorder.js";
 import { USER_EVENT } from "../../janus/observability/runtime-events.js";
 import { JanusDiceLab } from "./JanusDiceLab.js";
+import { createAnalyticsConsentControl } from "./analytics.js";
 
 export function HomeScreen({ mount, onStart }) {
   // Contenedor principal
@@ -208,6 +209,7 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
   poweredBy.className = 'footer-powered-by';
   poweredBy.textContent = 'Powered by Janus Governance';
   footer.appendChild(poweredBy);
+  footer.appendChild(createAnalyticsConsentControl());
   root.appendChild(footer);
 
   // Montar en el DOM
@@ -324,6 +326,24 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
       background: #2e4a4a;
       box-shadow: 0 4px 16px #0002;
     }
+    .analytics-consent {
+      max-width: 520px;
+      margin: 18px auto 0;
+      padding: 12px;
+      border: 1px solid #d7e0e0;
+      border-radius: 10px;
+      background: #fff;
+      color: #1a2a2a;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      text-align: left;
+    }
+    .analytics-consent p { margin: 0 0 8px; }
+    .analytics-consent-status { color: #4b5b5b; }
+    .analytics-consent-actions { display: flex; gap: 8px; margin: 8px 0; }
+    .analytics-consent-actions button { padding: 6px 10px; border: 1px solid #1a73e8; border-radius: 6px; background: #fff; color: #1a73e8; cursor: pointer; }
+    .analytics-consent-actions button:first-child { background: #1a73e8; color: #fff; }
+    .analytics-consent a { color: #1a73e8; }
     .home-footer {
       margin-top: auto;
       padding-top: 40px;
