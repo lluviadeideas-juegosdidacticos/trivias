@@ -1,6 +1,6 @@
 import { recordEvent } from "../../janus/observability/flight-recorder.js";
 import { USER_EVENT } from "../../janus/observability/runtime-events.js";
-import { DiceLab3D } from "./dice-lab/DiceLab3D.js";
+import { JanusDiceLab } from "./JanusDiceLab.js";
 
 export function HomeScreen({ mount, onStart }) {
   // Contenedor principal
@@ -166,7 +166,7 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
   root.appendChild(diceSection);
 
   let _nextWheel = 0;
-  DiceLab3D({
+  JanusDiceLab({
     mount: diceMount,
     onResult: (v) => {
       wheels[_nextWheel].setValue(v);
@@ -373,10 +373,9 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
       text-align: center;
       letter-spacing: 0.01em;
     }
-    .home-dice-mount canvas {
-      display: block;
-      width: 200px !important;
-      height: 200px !important;
+    .home-dice-mount .janus-dice-stage {
+      width: 200px;
+      height: 200px;
     }
   `;
   document.head.appendChild(style);
