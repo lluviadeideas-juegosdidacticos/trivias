@@ -45,7 +45,6 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
     container.className = 'wheel-picker';
     const values = [1, 2, 3, 4, 5, 6];
     let selected = 1;
-    let startY = null;
     let lastY = null;
     let isDragging = false;
 
@@ -94,8 +93,7 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
     // Mouse/touch/scroll handlers
     function onDragStart(e) {
       isDragging = true;
-      startY = e.touches ? e.touches[0].clientY : e.clientY;
-      lastY = startY;
+      lastY = e.touches ? e.touches[0].clientY : e.clientY;
       document.addEventListener('mousemove', onDragMove);
       document.addEventListener('mouseup', onDragEnd);
       document.addEventListener('touchmove', onDragMove, { passive: false });
@@ -119,14 +117,8 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
       document.removeEventListener('touchmove', onDragMove);
       document.removeEventListener('touchend', onDragEnd);
     }
-    function onWheel(e) {
-      if (e.deltaY > 0) setSelected(selected + 1);
-      if (e.deltaY < 0) setSelected(selected - 1);
-      e.preventDefault();
-    }
     container.addEventListener('mousedown', onDragStart);
     container.addEventListener('touchstart', onDragStart, { passive: false });
-    container.addEventListener('wheel', onWheel, { passive: false });
 
     setSelected(1);
     return {
