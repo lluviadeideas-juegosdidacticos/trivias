@@ -2,6 +2,7 @@ const MEASUREMENT_ID = 'G-F2JKMQ1ZLS';
 const CONSENT_KEY = 'lluvia-analytics-consent';
 
 let analyticsConsent = false;
+let analyticsChoiceMade = false;
 let analyticsLoaded = false;
 
 function loadAnalytics() {
@@ -32,7 +33,9 @@ function loadAnalytics() {
 
 export function initAnalytics() {
   try {
-    analyticsConsent = window.localStorage.getItem(CONSENT_KEY) === 'granted';
+    const storedConsent = window.localStorage.getItem(CONSENT_KEY);
+    analyticsConsent = storedConsent === 'granted';
+    analyticsChoiceMade = storedConsent === 'granted' || storedConsent === 'denied';
   } catch {
     analyticsConsent = false;
   }
@@ -41,6 +44,7 @@ export function initAnalytics() {
 
 export function setAnalyticsConsent(granted) {
   analyticsConsent = Boolean(granted);
+  analyticsChoiceMade = true;
   try {
     window.localStorage.setItem(CONSENT_KEY, analyticsConsent ? 'granted' : 'denied');
   } catch {}
@@ -58,7 +62,15 @@ export function trackQuestionPlayed(questionId) {
   });
 }
 
-export function createAnalyticsConsentControl() {
+export function createAnalyticsConsentControl({ showWhenSet = false } = {}) {
+  if (analyticsChoiceMade && !showWhenSet) {
+    const preferencesLink = document.createElement('a');
+    preferencesLink.className = 'analytics-preferences-link';
+    preferencesLink.href = './privacy.html';
+    preferencesLink.textContent = 'Privacidad y preferencias';
+    return preferencesLink;
+  }
+
   const section = document.createElement('section');
   section.className = 'analytics-consent';
   section.setAttribute('aria-label', 'Preferencias de medición');
@@ -72,9 +84,14 @@ export function createAnalyticsConsentControl() {
   status.setAttribute('aria-live', 'polite');
 
   function updateStatus() {
-    status.textContent = analyticsConsent
-      ? 'Medición activada.'
-      : 'Medición desactivada hasta que la aceptes.';
+    status.textContent = analyticsChoiceMade
+      ? (analyticsConsent ? 'Medición activada.' : 'Medición desactivada.')
+      : 'La medición está desactivada hasta que la aceptes.';
+  }
+  function saveChoice(granted) {
+    setAnalyticsConsent(granted);
+    updateStatus();
+    if (!showWhenSet) section.replaceWith(createAnalyticsConsentControl());
   }
   updateStatus();
   section.appendChild(status);
@@ -86,16 +103,14 @@ export function createAnalyticsConsentControl() {
   accept.type = 'button';
   accept.textContent = 'Aceptar medición';
   accept.addEventListener('click', () => {
-    setAnalyticsConsent(true);
-    updateStatus();
+    saveChoice(true);
   });
 
   const reject = document.createElement('button');
   reject.type = 'button';
   reject.textContent = 'Rechazar';
   reject.addEventListener('click', () => {
-    setAnalyticsConsent(false);
-    updateStatus();
+    saveChoice(false);
   });
 
   actions.append(accept, reject);
@@ -103,7 +118,7 @@ export function createAnalyticsConsentControl() {
 
   const policyLink = document.createElement('a');
   policyLink.href = './privacy.html';
-  policyLink.textContent = 'Más información sobre privacidad';
+  policyLink.textContent = showWhenSet ? 'Política de privacidad de Google' : 'Más información';
   section.appendChild(policyLink);
 
   return section;
