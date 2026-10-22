@@ -18,9 +18,13 @@
       <h2>Google Analytics</h2>
       <p>Solo si elegís “Aceptar medición” en la pantalla inicial, usamos Google Analytics 4 para contar cada vez que se muestra una pregunta válida. Enviamos el evento <code>question_played</code> y el número identificador de esa pregunta. No enviamos el texto, las opciones ni la respuesta elegida, ni nombres o datos de contacto.</p>
       <p>Google Analytics también puede procesar datos técnicos habituales de una visita, como navegador, dispositivo, ubicación aproximada y un identificador almacenado en una cookie. Desactivamos las funciones de señales de Google y personalización de anuncios para esta etiqueta. Más información en la <a href="https://policies.google.com/privacy">Política de Privacidad de Google</a>.</p>
+      <h2>Preferencias de medición</h2>
+      <p>Podés cambiar tu elección desde aquí:</p>
+      <div id="analytics-preferences"></div>
       <h2>Tu elección</h2>
       <p>Podés aceptar o rechazar la medición en la sección “Preferencias de medición” de la pantalla inicial. La elección se guarda solo en este navegador para recordar tu preferencia; no guardamos las jugadas en una base de datos propia. Si rechazás, no cargamos la etiqueta de Analytics ni enviamos eventos de preguntas.</p>
       <p><a href="./index.html">Volver a la trivia</a></p>
+      <script type="module" src="./src/trivia/privacy.js"></script>
     </main>
   </body>
 </html>

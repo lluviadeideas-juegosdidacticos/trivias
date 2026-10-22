@@ -1,4 +1,5 @@
 const STYLE_ID = 'janus-dice-lab-styles';
+const REST_TILT = Object.freeze({ x: -20, y: -25 });
 
 const FACE_ROTATIONS = Object.freeze({
   1: { x: 0, y: 0 },
@@ -26,7 +27,7 @@ function ensureStyles() {
     '.janus-dice-button:focus-visible { outline: 3px solid #1a73e8; outline-offset: 3px; }',
     '.janus-dice-button:disabled { cursor: wait; }',
     '.janus-dice-stage { width: 132px; height: 132px; display: grid; place-items: center; perspective: 640px; }',
-    '.janus-dice-cube { position: relative; width: 72px; height: 72px; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); transition: transform 950ms cubic-bezier(.2,.8,.2,1); }',
+    '.janus-dice-cube { display: block; position: relative; width: 72px; height: 72px; transform-style: preserve-3d; transform: rotateX(-20deg) rotateY(-25deg); transition: transform 950ms cubic-bezier(.2,.8,.2,1); }',
     '.janus-dice-face { position: absolute; inset: 0; display: grid; place-items: center; border: 2px solid #1a73e8; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 4px #f5faff; color: #1a2a2a; font: 800 2rem system-ui, sans-serif; backface-visibility: hidden; }',
     '.janus-dice-face--front { transform: translateZ(36px); }',
     '.janus-dice-face--back { transform: rotateY(180deg) translateZ(36px); }',
@@ -92,7 +93,7 @@ export function JanusDiceLab({ mount, onResult } = {}) {
     const result = Math.floor(Math.random() * 6) + 1;
     const rotation = faceRotationFor(result);
     const turns = 2 + (rollCount % 2);
-    cube.style.transform = 'rotateX(' + (rotation.x + 360 * turns) + 'deg) rotateY(' + (rotation.y + 360 * (turns + 1)) + 'deg)';
+    cube.style.transform = 'rotateX(' + (rotation.x + REST_TILT.x + 360 * turns) + 'deg) rotateY(' + (rotation.y + REST_TILT.y + 360 * (turns + 1)) + 'deg)';
     live.textContent = 'El dado está girando.';
 
     window.setTimeout(() => {
