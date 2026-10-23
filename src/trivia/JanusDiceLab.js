@@ -35,7 +35,6 @@ function ensureStyles() {
     '.janus-dice-face--left { transform: rotateY(-90deg) translateZ(36px); }',
     '.janus-dice-face--top { transform: rotateX(90deg) translateZ(36px); }',
     '.janus-dice-face--bottom { transform: rotateX(-90deg) translateZ(36px); }',
-    '.janus-dice-button:hover .janus-dice-cube { filter: drop-shadow(0 5px 7px rgba(0,0,0,.16)); }',
     '.janus-dice-live { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }',
     '@media (prefers-reduced-motion: reduce) { .janus-dice-cube { transition-duration: 1ms; } }',
   ].join('\n');
