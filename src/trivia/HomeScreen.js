@@ -196,12 +196,16 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
   isologo.alt = 'Isologo';
   isologo.className = 'footer-isologo prominent';
   footer.appendChild(isologo);
-  // Powered by Janus Governance text
+  // Metadata compacta del pie
+  const footerMeta = document.createElement('div');
+  footerMeta.className = 'footer-meta';
+
   const poweredBy = document.createElement('div');
   poweredBy.className = 'footer-powered-by';
   poweredBy.textContent = 'Powered by Janus Governance';
-  footer.appendChild(poweredBy);
-  footer.appendChild(createAnalyticsConsentControl());
+  footerMeta.appendChild(poweredBy);
+  footerMeta.appendChild(createAnalyticsConsentControl());
+  footer.appendChild(footerMeta);
   root.appendChild(footer);
 
   // Montar en el DOM
@@ -319,8 +323,11 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
       box-shadow: 0 4px 16px #0002;
     }
     .analytics-consent {
+      flex: 1 0 100%;
+      box-sizing: border-box;
+      width: 100%;
       max-width: 520px;
-      margin: 18px auto 0;
+      margin: 14px auto 0;
       padding: 12px;
       border: 1px solid #d7e0e0;
       border-radius: 10px;
@@ -365,11 +372,34 @@ Elegí tres números deslizando el dedo o lanzá el dado: cada respuesta suma co
         width: 110px;
       }
     }
+    .footer-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 4px 10px;
+      width: 100%;
+      font: 500 0.75rem/1.4 system-ui, sans-serif;
+      color: rgba(26,42,42,0.58);
+    }
     .footer-powered-by {
-      font-size: 0.75rem;
-      color: rgba(26,42,42,0.45);
-      margin-top: 6px;
-      letter-spacing: 0.04em;
+      margin: 0;
+      font: inherit;
+      letter-spacing: 0.01em;
+    }
+    .analytics-preferences-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 4px;
+      border-radius: 4px;
+      color: inherit;
+      font: inherit;
+      text-decoration: none;
+    }
+    .analytics-preferences-link:hover { text-decoration: underline; }
+    .analytics-preferences-link:focus-visible {
+      outline: 2px solid #1a73e8;
+      outline-offset: 2px;
     }
     .home-dice-section {
       display: flex;
